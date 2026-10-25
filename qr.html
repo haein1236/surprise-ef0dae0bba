@@ -40,6 +40,8 @@
         <label>Fond <select id="bg"><option value="white">Blanc</option><option value="transparent">Transparent</option></select></label><!-- fond -->
         <label>Taille <select id="size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option></select></label><!-- taille d'export -->
         <label class="check"><input type="checkbox" id="decor" checked> Points décoratifs</label><!-- remplir le cœur de points -->
+        <label>Photo au centre (facultatif) <input type="file" id="centerImg" accept="image/*"></label><!-- photo du couple découpée en cœur au milieu -->
+        <button type="button" id="centerClear" style="min-height:44px;padding:6px 14px;font-size:.9rem" hidden>Retirer la photo</button><!-- revenir au petit cœur noir -->
       </div><!-- fin options -->
       <button id="gen" type="submit">Générer</button><!-- bouton principal -->
     </form><!-- fin formulaire -->
@@ -64,6 +66,7 @@
     const f = v => +v.toFixed(2);                                                   // arrondi pour des chemins compacts
     const probe = document.createElement('canvas').getContext('2d');                // contexte pour tester « point dans le cœur central »
     let model = null, opts = null;                                                  // dernier résultat
+    let centerImg = null, centerUrl = "";                                           // photo centrale (image chargée + adresse data: pour le SVG)
 
     const inHeart = (x, y) => { const a = x * x + y * y - 1; return a * a * a - x * x * y * y * y <= 0; }; // équation du cœur : (x²+y²−1)³ − x²y³ ≤ 0
     function heartD(cx, cy, w) {                                                    // cœur centré en (cx, cy), largeur w
@@ -83,7 +86,7 @@
       return res;                                                                   // liste
     }                                                                               // fin alignPos
 
-    function build(text, type, padRatio, decor) {                                   // construit le modèle géométrique
+    function build(text, type, padRatio, decor, cw = .16) {                                   // construit le modèle géométrique
       const qr = qrcode(type, 'H');                                                 // correction d'erreur H (≈ 30 %)
       qr.addData(text, 'Byte'); qr.make();                                          // encode
       const n = qr.getModuleCount(), v = (n - 17) / 4;                              // taille + version
@@ -95,7 +98,7 @@
       const isAlign = (r, c) => ap.some(ar => ap.some(ac => !skip(ar, ac) && Math.abs(r - ar) <= 2 && Math.abs(c - ac) <= 2)); // dans un motif d'alignement ?
       const isFinder = (r, c) => (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7); // dans un repère d'angle
       const isProt = (r, c) => (r < 9 && c < 9) || (r < 9 && c >= n - 8) || (r >= n - 8 && c < 9) || r === 6 || c === 6 || isAlign(r, c) || (v >= 7 && ((r < 6 && c >= n - 11 && c < n - 8) || (c < 6 && r >= n - 11 && r < n - 8))); // modules vitaux (repères, format, timing, alignement, version)
-      const center = { x: ox + n / 2, y: oy + n / 2, w: Math.max(3.2, n * .16) };   // petit cœur noir central
+      const center = { x: ox + n / 2, y: oy + n / 2, w: Math.max(3.2, n * cw) };     // cœur central (noir ou photo), largeur = n × cw modules
       const halo = new Path2D(heartD(center.x, center.y, center.w + 1.6));          // zone libre autour du cœur central
       const dots = [], deco = [];                                                   // points de données / décoratifs
       let dropped = 0, dark = 0;                                                    // statistiques
@@ -139,7 +142,20 @@
       ctx.globalAlpha = 1; ctx.fill(new Path2D(p.dots));                            // données
       ctx.fill(new Path2D(p.rings), 'evenodd');                                     // anneaux (trou au milieu)
       ctx.fill(new Path2D(p.cores));                                                // centres
-      ctx.fillStyle = '#2b1b17'; ctx.fill(new Path2D(p.heart));                     // petit cœur noir
+      if (o.img) {                                                                  // photo au centre
+        const u = S / m.G, w = m.center.w * u, sc = w / 92;                         // largeur du cœur en pixels + échelle
+        const bx = m.center.x * u - w / 2, by = m.center.y * u - 40.5 * sc, bh = 81 * sc; // boîte englobante du cœur
+        const r = Math.max(w / o.img.naturalWidth, bh / o.img.naturalHeight);       // remplissage « cover »
+        const iw = o.img.naturalWidth * r, ih = o.img.naturalHeight * r;            // taille de la photo dessinée
+        ctx.save(); ctx.clip(new Path2D(p.heart));                                  // découpe en cœur
+        ctx.drawImage(o.img, bx + (w - iw) / 2, by + (bh - ih) * .3, iw, ih);       // photo centrée (visages un peu en haut)
+        ctx.restore();                                                              // fin découpe
+        ctx.lineJoin = 'round';                                                    // coins arrondis
+        ctx.lineWidth = u * .9; ctx.strokeStyle = '#fff'; ctx.stroke(new Path2D(p.heart)); // contour blanc
+        ctx.lineWidth = u * .35; ctx.strokeStyle = o.dot; ctx.stroke(new Path2D(p.heart)); // liseré rose
+      } else {                                                                      // sans photo
+        ctx.fillStyle = '#2b1b17'; ctx.fill(new Path2D(p.heart));                   // petit cœur noir
+      }                                                                             // fin centre
     }                                                                               // fin draw
 
     function toSVG(m, S, o) {                                                       // export SVG
@@ -148,7 +164,8 @@
         (o.bg === 'white' ? '<rect width="100%" height="100%" fill="#fff"/>' : '') + // fond
         `<path d="${p.deco}" fill="${o.dot}" fill-opacity=".42"/><path d="${p.dots}" fill="${o.dot}"/>` + // points
         `<path d="${p.rings}" fill="${o.dot}" fill-rule="evenodd"/><path d="${p.cores}" fill="${o.dot}"/>` + // repères
-        `<path d="${p.heart}" fill="#2b1b17"/></svg>`;                              // cœur central
+        (o.img ? `<defs><clipPath id="hc"><path d="${p.heart}"/></clipPath></defs><image href="${centerUrl}" x="${f(m.center.x * S / m.G - m.center.w * S / m.G / 2)}" y="${f(m.center.y * S / m.G - 40.5 * m.center.w * S / m.G / 92)}" width="${f(m.center.w * S / m.G)}" height="${f(81 * m.center.w * S / m.G / 92)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#hc)"/><path d="${p.heart}" fill="none" stroke="#fff" stroke-width="${f(.9 * S / m.G)}"/><path d="${p.heart}" fill="none" stroke="${o.dot}" stroke-width="${f(.35 * S / m.G)}"/>`
+              : `<path d="${p.heart}" fill="#2b1b17"/>`) + '</svg>';              // cœur central (photo ou noir)
     }                                                                               // fin toSVG
 
     function scannable(m, url, o) {                                                 // VÉRIFICATION avec jsQR
@@ -169,7 +186,7 @@
       const url = $('url').value.trim();                                            // URL saisie
       if (!url) { status.textContent = '✏️ Colle d\'abord l\'adresse de ton site en ligne.'; return; } // champ vide
       if (typeof qrcode === 'undefined' || typeof jsQR === 'undefined') { status.textContent = '⚠️ Bibliothèques non chargées : vérifie ta connexion Internet.'; return; } // CDN absent
-      opts = { dot: $('dot').value, bg: $('bg').value };                            // options
+      opts = { dot: $('dot').value, bg: $('bg').value, img: centerImg };           // options (+ photo centrale)
       $('png').disabled = $('svg').disabled = true;                                 // bloque les exports
       status.textContent = '⏳ Calcul et vérification…';                            // attente
       if (typeof qrcode.stringToBytesFuncs === 'object' && qrcode.stringToBytesFuncs['UTF-8']) qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8']; // accents en UTF-8
@@ -179,16 +196,17 @@
       const pads = [.2, .26, .32, .4, .5, .62];                                     // marges essayées (de la plus « cœur » à la plus sûre)
       const versions = [v0, v0 + 1, v0 + 2].filter(v => v <= 40);                   // versions essayées
       const decors = $('decor').checked ? [true, false] : [false];                  // avec puis sans décor
+      const cws = centerImg ? [.3, .26, .22, .18] : [.16];                          // taille du cœur central : photo la plus grande possible
       let chosen = null;                                                            // modèle retenu
-      search: for (const d of decors) for (const v of versions) for (let i = 0; i < pads.length; i++) { // ajustement automatique
+      search: for (const cw of cws) for (const d of decors) for (const v of versions) for (let i = 0; i < pads.length; i++) { // ajustement automatique
         await frame();                                                              // garde la page fluide
-        const m = build(url, v, pads[i], d);                                        // essai
+        const m = build(url, v, pads[i], d, cw);                                        // essai
         if (!scannable(m, url, opts)) continue;                                     // illisible → essai suivant
-        if (i + 1 < pads.length) { const m2 = build(url, v, pads[i + 1], d); if (scannable(m2, url, opts)) { chosen = m2; break search; } } // marge de sécurité : un cran de plus si possible
+        if (i + 1 < pads.length) { const m2 = build(url, v, pads[i + 1], d, cw); if (scannable(m2, url, opts)) { chosen = m2; break search; } } // marge de sécurité : un cran de plus si possible
         chosen = m; break search;                                                   // retenu
       }                                                                             // fin recherche
       const ok = !!chosen;                                                          // réussite ?
-      model = chosen || build(url, v0, pads[pads.length - 1], false);               // sinon la version la plus sûre
+      model = chosen || build(url, v0, pads[pads.length - 1], false, cws[cws.length - 1]);               // sinon la version la plus sûre
       const S = Number($('size').value);                                            // taille d'export
       out.width = out.height = S;                                                   // redimensionne le canvas
       draw(out.getContext('2d'), model, S, opts);                                   // dessine
@@ -208,6 +226,13 @@
     $('form').addEventListener('submit', e => { e.preventDefault(); generate(); }); // Générer (bouton ou Entrée)
     $('png').addEventListener('click', () => out.toBlob(b => download(b, 'qr-coeur.png'), 'image/png')); // export PNG
     $('svg').addEventListener('click', () => model && download(new Blob([toSVG(model, Number($('size').value), opts)], { type: 'image/svg+xml' }), 'qr-coeur.svg')); // export SVG
+    $('centerImg').addEventListener('change', () => {                              // une photo est choisie
+      const file = $('centerImg').files[0]; if (!file) return;                   // annulé
+      const fr = new FileReader();                                                  // lecture locale (aucun envoi)
+      fr.onload = () => { const im = new Image(); im.onload = () => { centerImg = im; centerUrl = fr.result; $('centerClear').hidden = false; if ($('url').value.trim()) generate(); }; im.src = fr.result; }; // image prête → régénère
+      fr.readAsDataURL(file);                                                       // adresse data: (utilisable dans le SVG)
+    });                                                                             // fin choix photo
+    $('centerClear').addEventListener('click', () => { centerImg = null; centerUrl = ""; $('centerImg').value = ""; $('centerClear').hidden = true; if (model) generate(); }); // retire la photo
     ['dot', 'bg', 'size', 'decor'].forEach(id => $(id).addEventListener('change', () => { if (model) generate(); })); // régénère si une option change
     if (/^https?:$/.test(location.protocol)) $('url').value = new URL('./', location.href).href; // en ligne : pré-remplit avec l'adresse du site
   })();                                                                             // fin du code
