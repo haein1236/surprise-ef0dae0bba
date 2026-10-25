@@ -120,7 +120,7 @@
   applyMedia();                                                           // premier affichage
 
   /* ───── 3. NAVIGATION ENTRE LES ÉTAPES ───── */
-  const BG = { 8: 'sky', 0: 'sky', 1: 'sky', 2: 'sky', 3: 'sky', 4: 'sky', 5: 'check', 6: 'sage', 7: 'sage' }; // fond de chaque étape
+  const BG = { 9: 'check', 8: 'sky', 0: 'sky', 1: 'sky', 2: 'sky', 3: 'sky', 4: 'sky', 5: 'check', 6: 'sage', 7: 'sage' }; // fond de chaque étape
   const onEnter = {};                                                     // actions à lancer en arrivant sur une étape
   let current = -1;                                                       // étape affichée (-1 = aucune)
   let busy = false;                                                       // transition en cours ?
@@ -868,6 +868,153 @@
     fn.textContent = (T.pourToi || 'pour {nom} ♡').replace('{nom}', name); // « for <prénom> ♡ »
     fn.hidden = !name;                                                    // cachée si pas de prénom
   }                                                                       // fin applyName
+  /* ───── 13. ÉTAPE 9 : FIN (bons d'amour + promesse + générique + souvenir) ───── */
+  $$('.js-finish').forEach(b => b.addEventListener('click', () => goTo(9))); // boutons « Terminer ♡ »
+  const couponsBox = $('#coupons');                                       // conteneur des coupons
+  let usedCoupons = [];                                                   // coupons déjà utilisés (indices)
+  try { usedCoupons = JSON.parse(store.get('coupons') || '[]'); } catch (e) { usedCoupons = []; } // relit la mémoire du téléphone
+  (Array.isArray(C.coupons) ? C.coupons : []).forEach((txt, i) => {       // crée chaque coupon
+    const b = document.createElement('button');                           // un coupon = un bouton
+    b.type = 'button'; b.className = 'coupon';                            // style ticket
+    b.innerHTML = '<span class="coupon-ico" aria-hidden="true">🎟️</span><span class="coupon-txt"><b></b><small></small></span><span class="coupon-stamp" aria-hidden="true"></span>'; // structure
+    $('b', b).textContent = String(txt);                                  // intitulé (depuis config.js)
+    $('small', b).textContent = T.valableCoupon || 'valable pour toujours'; // mention
+    $('.coupon-stamp', b).textContent = T.tamponUtilise || 'UTILISÉ ♡';   // tampon
+    const mark = () => { b.classList.add('is-used'); b.setAttribute('aria-pressed', 'true'); }; // pose le tampon
+    b.setAttribute('aria-pressed', 'false');                              // pas encore utilisé
+    if (usedCoupons.includes(i)) mark();                                  // déjà utilisé lors d'une visite précédente
+    b.addEventListener('click', () => {                                   // toucher = utiliser
+      if (b.classList.contains('is-used')) return;                        // une seule fois
+      mark();                                                             // tampon
+      usedCoupons.push(i); store.set('coupons', JSON.stringify(usedCoupons)); // retient
+      const r = b.getBoundingClientRect();                                // position
+      burst(r.right - 50, r.top + r.height / 2, 14, { spread: 150 });     // cœurs
+      vibrate(25);                                                        // petite vibration
+      say(`${txt} : utilisé !`);                                          // annonce
+    });                                                                   // fin clic
+    couponsBox.appendChild(b);                                            // ajoute à la page
+  });                                                                     // fin coupons
+
+  const promiseBtn = $('#promiseBtn');                                    // bouton à maintenir
+  const HOLD = 1400;                                                      // durée d'appui pour promettre (ms)
+  let holdStart = 0, holdRaf = 0, promised = false;                       // état de l'appui
+  function holdFrame(now) {                                               // remplit le cercle
+    const p = Math.min(1, (now - holdStart) / HOLD);                      // progression 0 → 1
+    promiseBtn.style.setProperty('--p', p.toFixed(3));                    // cercle
+    if (p >= 1) { keepPromise(); return; }                                // appui assez long → promesse !
+    holdRaf = requestAnimationFrame(holdFrame);                           // image suivante
+  }                                                                       // fin holdFrame
+  function holdBegin(e) {                                                 // début de l'appui
+    if (promised) return;                                                 // déjà promis
+    if (e) e.preventDefault();                                            // pas de menu / sélection
+    holdStart = performance.now();                                        // départ
+    promiseBtn.classList.add('is-holding');                               // enfoncé
+    vibrate(10);                                                          // petit retour
+    cancelAnimationFrame(holdRaf); holdRaf = requestAnimationFrame(holdFrame); // lance le remplissage
+  }                                                                       // fin holdBegin
+  function holdEnd() {                                                    // doigt relâché trop tôt
+    if (promised) return;                                                 // déjà promis
+    cancelAnimationFrame(holdRaf);                                        // stop
+    promiseBtn.classList.remove('is-holding');                            // relâché
+    promiseBtn.style.setProperty('--p', '0');                             // le cercle se vide
+  }                                                                       // fin holdEnd
+  promiseBtn.addEventListener('pointerdown', e => { try { promiseBtn.setPointerCapture(e.pointerId); } catch (err) { /* sans capture */ } holdBegin(e); }); // appui
+  ['pointerup', 'pointercancel'].forEach(t => promiseBtn.addEventListener(t, holdEnd)); // relâché
+  promiseBtn.addEventListener('contextmenu', e => e.preventDefault());    // pas de menu contextuel sur appui long
+  promiseBtn.addEventListener('click', e => { if (e.detail === 0) keepPromise(); }); // clavier (Entrée / Espace) = promesse directe
+  function fireworks() {                                                  // feu d'artifice de cœurs
+    const W = window.innerWidth, H = window.innerHeight;                  // taille de l'écran
+    const shots = reduced() ? 1 : 7;                                      // nombre d'explosions
+    for (let k = 0; k < shots; k++) setTimeout(() => burst(rand(W * .15, W * .85), rand(H * .15, H * .55), 22, { spread: 200 }), k * 260); // explosions successives
+    rise(30);                                                             // + cœurs qui montent
+  }                                                                       // fin fireworks
+  function keepPromise() {                                                // la promesse est faite
+    if (promised) return;                                                 // une seule fois
+    promised = true;                                                      // verrou
+    cancelAnimationFrame(holdRaf);                                        // stop
+    promiseBtn.style.setProperty('--p', '1');                             // cercle plein
+    promiseBtn.classList.remove('is-holding'); promiseBtn.classList.add('is-done'); // vert
+    promiseBtn.setAttribute('aria-pressed', 'true');                      // accessibilité
+    $('#promiseLabel').textContent = T.promesseFaite || 'Promesse faite ! 🤙♡'; // message
+    vibrate([40, 60, 40, 60, 120]);                                       // vibration de fête
+    fireworks();                                                          // feu d'artifice
+    say(T.promesseFaite || 'Promesse faite !');                           // annonce
+    const end = $('#theEnd');                                             // générique
+    $('#endCredits').textContent = (T.credits || 'Fait avec amour par {de} pour {nom}').replace('{de}', C.expediteur || '♡').replace('{nom}', visitorName || C.destinataire || 'toi'); // « Fait avec amour par … pour … »
+    $('#endDate').textContent = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); // date du jour en français
+    setTimeout(() => {                                                    // après le feu d'artifice
+      end.hidden = false;                                                 // affiche le générique
+      fx(end, { opacity: 0, y: 30 }, { opacity: 1, y: 0 }, { duration: .8, ease: 'back.out(1.4)' }); // apparition
+      end.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }); // fait défiler jusqu'à « FIN »
+    }, reduced() ? 50 : 1200);                                            // délai
+  }                                                                       // fin keepPromise
+
+  function loadImg(src) {                                                 // charge une image (ou null si impossible)
+    return new Promise(res => { if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); // promesse
+  }                                                                       // fin loadImg
+  async function makeSouvenir() {                                         // dessine la carte-souvenir (1080 × 1350)
+    const W = 1080, H = 1350;                                             // format portrait Instagram
+    const c = document.createElement('canvas'); c.width = W; c.height = H; // canvas
+    const g = c.getContext('2d');                                         // contexte
+    try {                                                                 // polices prêtes… mais jamais plus de 2 s d'attente
+      await Promise.race([                                                // la première des deux promesses gagne
+        Promise.all(['120px "Great Vibes"', '60px "Patrick Hand"', '24px "Press Start 2P"'].map(f => document.fonts.load(f))), // chargement des polices
+        wait(2000)                                                        // connexion lente : on dessine quand même
+      ]);                                                                 // fin course
+    } catch (e) { /* polices système */ }                                 // erreur → polices de secours
+    const bg = g.createLinearGradient(0, 0, 0, H);                        // fond rose
+    bg.addColorStop(0, '#ffc7dc'); bg.addColorStop(1, '#f9b9d0');         // dégradé
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);                             // remplit
+    const heart = new Path2D(HEART_D);                                    // cœur
+    for (let i = 0; i < 26; i++) {                                        // petits cœurs éparpillés
+      g.save(); g.translate(rand(0, W), rand(0, H)); g.rotate(rand(-.5, .5)); const s = rand(.25, .7); g.scale(s, s); // position + taille
+      g.fillStyle = ['#fff', '#ef7fa8', '#fbe3ec'][i % 3]; g.globalAlpha = .55; g.fill(heart); g.restore(); // dessine
+    }                                                                     // fin cœurs
+    g.globalAlpha = 1;                                                    // opacité normale
+    g.fillStyle = '#b3262e'; g.textAlign = 'center';                      // titre rouge centré
+    g.font = '130px "Great Vibes", cursive';                              // script
+    g.fillText(T.titreSouvenir || 'Toi & moi ♡', W / 2, 190);            // « Toi & moi ♡ »
+    g.save(); g.translate(W / 2, 690); g.rotate(-.04);                    // polaroid penché au centre
+    g.shadowColor = 'rgba(0,0,0,.25)'; g.shadowBlur = 40; g.shadowOffsetY = 18; // ombre
+    g.fillStyle = '#fff'; g.fillRect(-350, -380, 700, 800);               // cadre blanc
+    g.shadowColor = 'transparent';                                        // fin ombre
+    const photo = await loadImg(media.couple);                            // photo du couple (ou la sienne)
+    g.fillStyle = '#ffd6e6'; g.fillRect(-310, -340, 620, 620);            // fond si pas de photo
+    if (photo) {                                                          // photo disponible
+      const r = Math.max(620 / photo.naturalWidth, 620 / photo.naturalHeight); // remplissage « cover »
+      const iw = photo.naturalWidth * r, ih = photo.naturalHeight * r;    // taille dessinée
+      g.save(); g.beginPath(); g.rect(-310, -340, 620, 620); g.clip();    // limite au cadre photo
+      g.drawImage(photo, -310 + (620 - iw) / 2, -340 + (620 - ih) * .3, iw, ih); // photo (visages vers le haut)
+      g.restore();                                                        // fin découpe
+    }                                                                     // fin photo
+    g.fillStyle = '#6b4a3a'; g.font = '62px "Patrick Hand", cursive';     // légende manuscrite
+    g.fillText(`${visitorName || C.destinataire || 'toi'} ♡ ${C.expediteur || 'moi'}`, 0, 365); // « Claire ♡ … »
+    g.restore();                                                          // fin polaroid
+    g.fillStyle = '#6b4a3a'; g.font = '26px "Press Start 2P", monospace'; // date pixel
+    g.fillText(new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }), W / 2, 1200); // date du jour
+    g.fillStyle = '#b3262e'; g.font = '80px "Great Vibes", cursive';      // « pour toujours »
+    g.fillText('pour toujours ♡', W / 2, 1300);                           // signature finale
+    return new Promise(res => c.toBlob(res, 'image/png'));                // image PNG
+  }                                                                       // fin makeSouvenir
+  $('#souvenirBtn').addEventListener('click', async () => {               // « Télécharger notre souvenir »
+    const msg = $('#souvenirMsg');                                        // message
+    msg.textContent = '…';                                                // patience
+    try {                                                                 // protégé
+      const blob = await makeSouvenir();                                  // fabrique l'image
+      const file = new File([blob], 'notre-souvenir.png', { type: 'image/png' }); // fichier
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {  // téléphone : menu « Partager / Enregistrer l'image »
+        try { await navigator.share({ files: [file], title: T.titreSouvenir || 'Toi & moi ♡' }); msg.textContent = 'Souvenir gardé ♡'; } // partage
+        catch (e) { msg.textContent = e && e.name === 'AbortError' ? '' : 'Oups, réessaie ♡'; } // annulé ou erreur
+        return;                                                           // fin
+      }                                                                   // fin partage
+      const a = document.createElement('a');                              // ordinateur : téléchargement
+      a.href = URL.createObjectURL(blob); a.download = 'notre-souvenir.png'; // lien
+      document.body.appendChild(a); a.click(); a.remove();                // télécharge
+      setTimeout(() => URL.revokeObjectURL(a.href), 3000);                // nettoyage
+      msg.textContent = 'Souvenir téléchargé ♡';                          // confirmation
+    } catch (e) { msg.textContent = 'Oups, la photo n’a pas pu être créée ♡'; } // erreur
+  });                                                                     // fin souvenir
+
   async function startJourney() {                                         // appelé quand le CSS s'allume
     const savedName = store.get('name') || '';                            // prénom déjà saisi ?
     useOwn = store.get('own') === '1';                                    // choix précédent

@@ -432,6 +432,7 @@
           </div><!-- fin contenu -->
         </div><!-- fin fenêtre -->
         <div class="btn-row end-row"><!-- autres actions -->
+          <button class="btn btn-yes js-finish" type="button" data-t="terminer">Terminer ♡</button><!-- vers l'écran de fin -->
           <button class="btn btn-choice js-change-photos" type="button" data-t="changerPhotos">📷 Changer les photos</button><!-- remettre ses photos -->
           <button class="btn btn-main js-replay" type="button" data-t="rejouer">Recommencer ♡</button><!-- rejouer -->
         </div><!-- fin actions -->
@@ -462,6 +463,7 @@
         </div><!-- fin paroles -->
         <p id="kissCount" class="kiss-count" data-t="consigneBisous">touche l'écran pour m'envoyer des bisous 💋</p><!-- compteur de bisous -->
         <div class="btn-row end-row"><!-- actions -->
+          <button class="btn btn-yes js-finish" type="button" data-t="terminer">Terminer ♡</button><!-- vers l'écran de fin -->
           <button class="btn btn-choice js-change-photos" type="button" data-t="changerPhotos">📷 Changer les photos</button><!-- remettre ses photos -->
           <button class="btn btn-main js-replay" type="button" data-t="rejouer">Recommencer ♡</button><!-- rejouer -->
         </div><!-- fin actions -->
@@ -480,6 +482,40 @@
         </div><!-- fin contenu -->
       </div><!-- fin outil -->
     </section><!-- fin étape 8 -->
+
+    <!-- ── ÉTAPE 9 : FIN (bons d'amour + promesse + générique + souvenir) ── -->
+    <section class="step step-9" data-step="9" aria-labelledby="t9" hidden><!-- écran de fin -->
+      <h1 id="t9" class="script-title end-title" tabindex="-1" data-focus data-t="titreFin">Avant de partir…</h1><!-- titre -->
+      <p class="end-sub" data-t="sousTitreCoupons">Voici tes bons d'amour. Touche-en un pour l'utiliser ♡</p><!-- consigne -->
+      <div id="coupons" class="coupons"></div><!-- coupons (créés par le script depuis config.js) -->
+
+      <div class="win promise-win"><!-- fenêtre promesse -->
+        <div class="titlebar"><span class="tb-title">♡ promesse.exe</span><span class="tb-btns" aria-hidden="true"><i>▁</i><i>☐</i><i>✕</i></span></div><!-- barre de titre -->
+        <div class="win-body promise-body"><!-- contenu -->
+          <p class="ask-text" data-t="questionPromesse">Promets-moi de garder ce petit site pour toujours ?</p><!-- la promesse -->
+          <button id="promiseBtn" class="promise-btn" type="button"><!-- bouton à maintenir -->
+            <span class="promise-ring" aria-hidden="true"></span><!-- cercle qui se remplit -->
+            <span class="promise-ico" aria-hidden="true">🤙</span><!-- petit doigt -->
+          </button><!-- fin bouton -->
+          <p id="promiseLabel" class="promise-label" data-t="boutonPromesse">Maintiens pour promettre 🤙</p><!-- consigne / résultat -->
+        </div><!-- fin contenu -->
+      </div><!-- fin fenêtre promesse -->
+
+      <div id="theEnd" class="the-end" hidden><!-- générique de fin -->
+        <div class="end-gang" aria-hidden="true"><!-- les mascottes qui dansent -->
+          <svg class="mascot dance d1" viewBox="0 0 140 160"><use href="#m-bear"/></svg><!-- ourson -->
+          <svg class="mascot dance d2" viewBox="0 0 140 150"><use href="#m-kitten-heart"/></svg><!-- chaton -->
+          <svg class="mascot dance d3" viewBox="0 0 160 130"><use href="#m-capy-flower"/></svg><!-- capybara -->
+        </div><!-- fin mascottes -->
+        <p class="end-fin" data-t="fin">FIN ♡</p><!-- grand « FIN » -->
+        <p id="endCredits" class="end-credits"></p><!-- « Fait avec amour par … pour … » -->
+        <p id="endDate" class="end-date"></p><!-- date du jour -->
+        <p class="end-next" data-t="aSuivre">…à suivre, pour toujours</p><!-- petite phrase -->
+        <button id="souvenirBtn" class="btn btn-main" type="button" data-t="boutonSouvenir">📸 Télécharger notre souvenir</button><!-- carte-souvenir -->
+        <p id="souvenirMsg" class="end-sub" aria-live="polite"></p><!-- message après téléchargement -->
+        <button class="btn btn-choice js-replay" type="button" data-t="rejouer">Recommencer ♡</button><!-- rejouer -->
+      </div><!-- fin générique -->
+    </section><!-- fin étape 9 -->
 
   </main><!-- fin application -->
 

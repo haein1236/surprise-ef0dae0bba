@@ -49,7 +49,13 @@ const CONFIG = {                                           // objet global lu pa
   ],                                                       // fin des mots doux
   dureeMotDoux: 6,                                         // secondes entre deux mots doux
 
-  effetHtmlBrut: true,                                    // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
+  coupons: [                                               // bons d'amour de l'écran de fin (autant que tu veux)
+    "Bon pour 1 câlin infini 🤗",                          // coupon 1
+    "Bon pour un resto en amoureux 🍝",                    // coupon 2
+    "Bon pour 100 bisous 💋"                               // coupon 3
+  ],                                                       // fin des coupons
+
+  effetHtmlBrut: true,                                   // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
   dureeHtmlBrut: 1500,                                     // durée de l'effet HTML brut en millisecondes
 
   textes: {                                                // tous les petits textes du parcours (facultatif à modifier)
@@ -101,6 +107,19 @@ const CONFIG = {                                           // objet global lu pa
     titreMusique: "Notre chanson",                         // titre de l'écran musique
     consigneBisous: "touche l'écran pour m'envoyer des bisous 💋", // petite consigne
     compteurBisous: "{n} bisou(s) envoyé(s) 💋",            // compteur ({n} = nombre)
+    terminer: "Terminer ♡",                                // bouton vers l'écran de fin
+    titreFin: "Avant de partir…",                          // titre de l'écran de fin
+    sousTitreCoupons: "Voici tes bons d'amour. Touche-en un pour l'utiliser ♡", // consigne des coupons
+    tamponUtilise: "UTILISÉ ♡",                            // tampon posé sur un coupon utilisé
+    valableCoupon: "valable pour toujours",                // petite mention sur chaque coupon
+    questionPromesse: "Promets-moi de garder ce petit site pour toujours ?", // texte de la promesse
+    boutonPromesse: "Maintiens pour promettre 🤙",         // bouton à maintenir appuyé
+    promesseFaite: "Promesse faite ! 🤙♡",                 // message une fois la promesse faite
+    fin: "FIN ♡",                                          // grand mot de la fin
+    credits: "Fait avec amour par {de} pour {nom}",        // générique ({de} = expediteur, {nom} = prénom saisi)
+    aSuivre: "…à suivre, pour toujours",                   // petite phrase sous le générique
+    boutonSouvenir: "📸 Télécharger notre souvenir",       // bouton carte-souvenir
+    titreSouvenir: "Toi & moi ♡",                          // titre écrit sur la carte-souvenir
     continuer: "Continuer ♡",                              // texte des boutons « continuer »
     rejouer: "Recommencer ♡"                               // texte du bouton final
   }                                                        // fin des textes
