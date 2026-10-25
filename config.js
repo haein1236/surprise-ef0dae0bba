@@ -7,8 +7,8 @@ const CONFIG = {                                           // objet global lu pa
   expediteur: "Ton amoureux·se",                           // ta signature en bas de la lettre (étape 7)
   toutesLesDates: true,                                    // true = N'IMPORTE QUELLE date valide (ex. sa date d'anniversaire) débloque la surprise
   dateSecrete: "17-10",                                    // utilisée seulement si toutesLesDates = false : "JJ-MM" (année libre) ou "JJ-MM-AAAA"
-  titreChanson: "Notre chanson",                           // titre affiché sur le lecteur (étape 4)
-  artiste: "Toi & moi",                                    // artiste affiché sous le titre
+  titreChanson: "Kiss Me",                                 // titre affiché sur le lecteur (étape 4)
+  artiste: "Ariana Grande",                                  // artiste affiché sous le titre
   fichierAudio: "audio/chanson.mp3",                       // ta chanson (mp3, m4a ou mp4) ; vide = petite mélodie « boîte à musique » générée
 
   photos: {                                                // chemins des photos (noms simples, sans espaces ni emoji)
