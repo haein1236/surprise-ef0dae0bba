@@ -551,6 +551,59 @@ body[data-bg="sage"] .bg-sage { opacity: 1; }                  /* …ou sauge : 
 .pick-text small { font: .8rem var(--f-body); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; } /* nom du fichier */
 .for-name { font: 1.5rem var(--f-hand); color: var(--brown); margin: -14px 0 14px; } /* « for <prénom> ♡ » */
 
+/* ───── 12 ter. APRÈS LA LETTRE + ÉTAPE 8 : NOTRE CHANSON ───── */
+.after-letter { width: min(100%, 420px); display: flex; flex-direction: column; align-items: center; gap: 16px; } /* bloc sous la lettre */
+.win-ask-music { width: 100%; }                                /* fenêtre question */
+.win-ask-music .ask-text { font-size: 1.5rem; margin-bottom: 16px; } /* question */
+.end-row { gap: 10px; }                                        /* actions finales */
+.wiggle { animation: wiggle .25s ease-in-out 4; }              /* le bouton « Oui » gigote après un « non » */
+
+.music-stage {                                                 /* scène musique */
+  position: relative; width: min(100%, 440px);                 /* largeur */
+  display: flex; flex-direction: column; align-items: center; gap: 10px; /* colonne */
+  background: rgba(251, 241, 222, .92); border: 2px solid var(--brown); border-radius: 22px; /* carte crème */
+  padding: 18px 18px 22px; box-shadow: var(--shadow);          /* ombre */
+  -webkit-user-select: none; user-select: none;                /* pas de sélection en tapotant */
+}                                                              /* fin scène */
+.music-title { font-size: clamp(2.4rem, 11vw, 3.2rem); margin: 0; } /* titre script */
+.record { position: relative; width: min(62vw, 230px); aspect-ratio: 1; margin: 4px 0 6px; } /* tourne-disque */
+.record-disc {                                                 /* disque vinyle */
+  position: absolute; inset: 0; border-radius: 50%;            /* rond */
+  background: radial-gradient(circle, transparent 0 33%, #111 33.5% 35%, transparent 35.5%), repeating-radial-gradient(circle, #1b1b1b 0 2px, #2c2c2c 2px 3px); /* sillons */
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .3), inset 0 0 0 3px #111; /* ombre */
+  animation: spin 6s linear infinite; animation-play-state: paused; /* tourne pendant la musique */
+}                                                              /* fin disque */
+.record-disc::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, .2), transparent 45%); } /* reflet */
+.record-disc img { position: absolute; inset: 31%; width: 38%; height: 38%; border-radius: 50%; object-fit: cover; border: 3px solid var(--pink); background: var(--pink); } /* photo au centre du disque */
+.record-arm { position: absolute; right: -6%; top: -4%; width: 8%; height: 58%; background: linear-gradient(90deg, #d9d2c9, #fff, #c9c0b5); border: 2px solid var(--brown); border-radius: 8px; transform-origin: 50% 8%; transform: rotate(18deg); transition: transform .6s ease; } /* bras */
+.music-stage.is-playing .record-arm { transform: rotate(30deg); } /* bras posé sur le disque */
+.music-stage.is-playing .record-disc { animation-play-state: running; } /* le disque tourne */
+.note-fly { position: absolute; top: 20%; left: 50%; font-size: 1.6rem; color: var(--pink-d); opacity: 0; pointer-events: none; } /* notes */
+.music-stage.is-playing .note-fly { animation: noteUp 3s ease-out infinite; } /* notes qui s'envolent */
+.nf2 { left: 20%; color: var(--red); animation-delay: -1s !important; } /* note 2 */
+.nf3 { left: 78%; color: var(--green-d); animation-delay: -2s !important; } /* cœur */
+@keyframes noteUp { 0% { opacity: 0; translate: 0 0; } 20% { opacity: 1; } 100% { opacity: 0; translate: 20px -90px; rotate: 20deg; } } /* envol */
+.music-song { display: flex; flex-direction: column; align-items: center; } /* titre + artiste */
+.music-song b { font: 800 1.2rem var(--f-body); }              /* titre */
+.music-song span { font: .95rem var(--f-body); opacity: .75; } /* artiste */
+.music-bar { width: 100%; height: 12px; background: rgba(107, 74, 58, .15); border-radius: 9px; overflow: hidden; cursor: pointer; padding: 0; margin-top: 6px; } /* barre touchable */
+.music-bar span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--pink), var(--pink-d)); border-radius: inherit; } /* progression */
+.music-times { width: 100%; display: flex; justify-content: space-between; font: 10px var(--f-pixel); opacity: .7; } /* temps */
+.music-ctrls { display: flex; align-items: center; gap: 18px; } /* commandes */
+.m-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--brown); background: #fff; font-size: 1.3rem; box-shadow: 0 4px 0 var(--brown); cursor: pointer; display: grid; place-items: center; } /* bouton rond */
+.m-btn:active { translate: 0 3px; box-shadow: 0 1px 0 var(--brown); } /* enfoncé */
+.m-play { width: 68px; height: 68px; background: var(--red); color: var(--cream); font-size: 1.6rem; } /* gros bouton lecture */
+.lyrics { width: 100%; min-height: 150px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-align: center; padding: 8px 4px; } /* zone des paroles */
+.ly-prev, .ly-next { font: 1rem var(--f-hand); opacity: .4; min-height: 1.3em; } /* lignes voisines pâles */
+.ly-now { display: flex; flex-direction: column; gap: 4px; }   /* ligne actuelle */
+.ly-text { font: 1.55rem/1.2 var(--f-hand); color: var(--red); } /* texte chanté / mot doux */
+.ly-trad { font: italic 1.05rem/1.3 var(--f-body); color: var(--brown); opacity: .85; } /* traduction */
+.ly-trad:empty { display: none; }                              /* pas de traduction → rien */
+.kiss-count { font: 1.05rem var(--f-hand); opacity: .8; }      /* compteur de bisous */
+.sync-panel { width: min(100%, 440px); margin-top: 18px; }     /* outil de synchro */
+.sync-body { display: flex; flex-direction: column; gap: 10px; text-align: left; font: .95rem/1.4 var(--f-body); } /* contenu */
+.sync-body textarea { width: 100%; font: 16px/1.4 ui-monospace, monospace; border: 2px solid var(--brown); border-radius: 10px; padding: 8px; background: #fff; color: var(--brown); } /* zones de texte */
+
 /* ───── 13. ANIMATIONS ───── */
 @keyframes bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } } /* flottement */
 @keyframes pulse { 0%, 100% { scale: 1; } 50% { scale: 1.12; } } /* battement */

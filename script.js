@@ -120,7 +120,7 @@
   applyMedia();                                                           // premier affichage
 
   /* ───── 3. NAVIGATION ENTRE LES ÉTAPES ───── */
-  const BG = { 0: 'sky', 1: 'sky', 2: 'sky', 3: 'sky', 4: 'sky', 5: 'check', 6: 'sage', 7: 'sage' }; // fond de chaque étape
+  const BG = { 8: 'sky', 0: 'sky', 1: 'sky', 2: 'sky', 3: 'sky', 4: 'sky', 5: 'check', 6: 'sage', 7: 'sage' }; // fond de chaque étape
   const onEnter = {};                                                     // actions à lancer en arrivant sur une étape
   let current = -1;                                                       // étape affichée (-1 = aucune)
   let busy = false;                                                       // transition en cours ?
@@ -398,7 +398,14 @@
   const songBar = $('#songBar');                                          // barre de progression
   const songTime = $('#songTime');                                        // temps affiché
   const audioHint = $('#audioHint');                                      // info audio
-  let audio = null;                                                       // lecteur audio
+  const musicStage = $('#musicStage');                                    // scène de l'écran musique (étape 8)
+  const musicPlay = $('#musicPlay');                                      // bouton lecture de l'écran musique
+  const musicBar = $('#musicBar');                                        // barre de l'écran musique
+  const musicBarWrap = $('#musicBarWrap');                                // rail de la barre (curseur accessible)
+  const musicTime = $('#musicTime');                                      // temps écoulé
+  const musicDur = $('#musicDur');                                        // durée totale
+  let onTime = null;                                                      // fonction appelée à chaque image (paroles)
+  let audio = null;                                                      // lecteur audio
   let useSynth = true;                                                    // boîte à musique tant qu'il n'y a pas de fichier
   let playing = false;                                                    // en lecture ?
   function setSong(url) {                                                 // choisit la chanson (config.js ou fichier perso)
@@ -410,6 +417,7 @@
     audio.preload = 'none';                                               // ne télécharge rien avant le clic
     audio.src = url;                                                      // chemin ou adresse blob
     audio.addEventListener('ended', () => setPlaying(false));             // fin du morceau
+    audio.addEventListener('loadedmetadata', () => paint());              // durée connue → affichage
   }                                                                       // fin setSong
   setSong(DEFAULT_MEDIA.audio);                                           // chanson de config.js au départ
   const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; // secondes → m:ss
@@ -419,15 +427,29 @@
     playBtn.setAttribute('aria-label', p ? 'Mettre la chanson en pause' : 'Lancer la chanson'); // libellé
     $('.ico', playBtn).textContent = p ? '❚❚' : '▶';                      // icône
     scrap.classList.toggle('is-playing', p);                              // vinyle + bobines tournent
+    musicPlay.setAttribute('aria-pressed', String(p));                    // écran musique : accessibilité
+    musicPlay.setAttribute('aria-label', p ? 'Mettre la chanson en pause' : 'Lancer la chanson'); // libellé
+    $('.ico', musicPlay).textContent = p ? '❚❚' : '▶';                    // icône
+    musicStage.classList.toggle('is-playing', p);                         // disque qui tourne + notes
     if (p) requestAnimationFrame(tick);                                   // lance la barre de progression
   }                                                                       // fin setPlaying
+  function songPos() {                                                    // position actuelle { secs, dur }
+    if (useSynth) return { secs: Synth.progress() * Synth.length, dur: Synth.length }; // boîte à musique
+    if (audio && audio.duration) return { secs: audio.currentTime, dur: audio.duration }; // fichier audio
+    return { secs: 0, dur: 0 };                                           // pas encore chargé
+  }                                                                       // fin songPos
+  function paint() {                                                      // dessine barres + temps + paroles
+    const { secs, dur } = songPos();                                      // position
+    const pct = dur ? (secs / dur * 100) : 0;                             // pourcentage
+    songBar.style.width = musicBar.style.width = pct.toFixed(1) + '%';    // barres (scrapbook + écran musique)
+    songTime.textContent = musicTime.textContent = fmt(secs);             // temps écoulé
+    musicDur.textContent = dur ? fmt(dur) : '--:--';                      // durée
+    musicBarWrap.setAttribute('aria-valuenow', String(Math.round(pct)));  // accessibilité
+    if (onTime) onTime(secs);                                             // paroles / mots doux
+  }                                                                       // fin paint
   function tick() {                                                       // progression à chaque image
     if (!playing) return;                                                 // arrêté
-    let ratio = 0, secs = 0;                                              // avancement
-    if (useSynth) { ratio = Synth.progress(); secs = ratio * Synth.length; } // boîte à musique
-    else if (audio && audio.duration) { ratio = audio.currentTime / audio.duration; secs = audio.currentTime; } // fichier audio
-    songBar.style.width = (ratio * 100).toFixed(1) + '%';                 // barre
-    songTime.textContent = fmt(secs);                                     // temps
+    paint();                                                              // dessine
     requestAnimationFrame(tick);                                          // image suivante
   }                                                                       // fin tick
   function startSynth(info) {                                             // bascule sur la boîte à musique
@@ -435,16 +457,21 @@
     if (Synth.start()) setPlaying(true);                                  // joue
     if (info) { audioHint.textContent = info; audioHint.hidden = false; } // explique pourquoi
   }                                                                       // fin startSynth
-  playBtn.addEventListener('click', async () => {                         // clic sur ▶ (l'audio ne démarre qu'après ce geste)
-    if (playing) {                                                        // déjà en lecture → pause
+  async function togglePlay(forcePlay) {                                  // lecture / pause (l'audio ne démarre qu'après un geste)
+    if (playing) {                                                        // déjà en lecture
+      if (forcePlay === true) return;                                     // on voulait juste « jouer » : rien à faire
       if (useSynth) Synth.stop(); else audio.pause();                     // arrête la source
       setPlaying(false);                                                  // état
       return;                                                             // fin
     }                                                                     // fin pause
     if (useSynth) { startSynth(); return; }                               // boîte à musique
     try { await audio.play(); setPlaying(true); }                         // joue le fichier
-    catch (err) { startSynth('Fichier audio introuvable : petite boîte à musique à la place ♡'); } // fichier absent → repli
-  });                                                                     // fin clic lecture
+    catch (err) {                                                         // lecture refusée
+      if (err && err.name === 'NotAllowedError') return;                 // navigateur qui attend un toucher : on laisse le bouton ▶
+      startSynth('Fichier audio introuvable : petite boîte à musique à la place ♡'); // fichier absent → repli
+    }                                                                     // fin erreur
+  }                                                                       // fin togglePlay
+  playBtn.addEventListener('click', () => togglePlay());                  // ▶ du scrapbook
 
   /* ───── 9. ÉTAPE 5 : PHOTOBOOTH ───── */
   const booth = $('#booth');                                              // scène
@@ -613,15 +640,116 @@
     caret.remove();                                                       // retire le curseur
     typing = false;                                                       // fini
     rise(28);                                                             // cœurs qui montent
-    const rb = $('#replayBtn');                                           // bouton rejouer
-    rb.hidden = false;                                                    // l'affiche
-    fx(rb, { opacity: 0, y: 14 }, { opacity: 1, y: 0 }, { duration: .5, ease: 'back.out(1.7)' }); // apparition
+    const al = $('#afterLetter');                                         // question « Tu veux écouter notre chanson ? »
+    al.hidden = false;                                                    // l'affiche
+    fx(al, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: .6, ease: 'back.out(1.7)' }); // apparition
+    al.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'center' }); // fait défiler jusqu'à la question
   }                                                                       // fin typeLetter
   $('#letter').addEventListener('click', () => { if (typing) skipTyping = true; }); // toucher la lettre = tout afficher
   onEnter[7] = () => { setTimeout(typeLetter, reduced() ? 0 : 500); };    // démarre en arrivant
-  $('#replayBtn').addEventListener('click', () => {                       // rejouer
+  $$('.js-replay').forEach(b => b.addEventListener('click', () => {       // boutons « Recommencer »
     location.href = location.pathname + '?replay=1';                      // recharge depuis le début (sans l'effet HTML brut)
-  });                                                                     // fin rejouer
+  }));                                                                    // fin rejouer
+  $$('.js-change-photos').forEach(b => b.addEventListener('click', () => { // boutons « Changer les photos »
+    location.href = location.pathname + '?photos=1';                      // retour à l'accueil, panneau photos ouvert
+  }));                                                                    // fin changer les photos
+
+  /* ───── 11 bis. APRÈS LA LETTRE → ÉTAPE 8 : NOTRE CHANSON ───── */
+  const PAROLES = (Array.isArray(C.paroles) ? C.paroles : [])             // paroles synchronisées (config.js)
+    .filter(l => l && typeof l.t === 'number' && l.texte)                 // lignes valides seulement
+    .sort((a, b) => a.t - b.t);                                           // dans l'ordre du temps
+  const MOTS = (Array.isArray(C.motsDoux) ? C.motsDoux : []).filter(Boolean); // mots doux de secours
+  const lyPrev = $('.ly-prev'), lyNext = $('.ly-next'), lyNow = $('.ly-now'); // lignes affichées
+  const lyText = $('.ly-text'), lyTrad = $('.ly-trad');                   // texte + traduction
+  let lyIndex = -2;                                                       // ligne affichée (-2 = rien encore)
+  function showLine(i) {                                                  // affiche la ligne i
+    if (i === lyIndex) return;                                            // déjà affichée
+    lyIndex = i;                                                          // mémorise
+    if (PAROLES.length) {                                                 // mode paroles + traduction
+      const cur = PAROLES[i];                                             // ligne actuelle
+      lyPrev.textContent = i > 0 ? PAROLES[i - 1].texte : '';             // ligne d'avant
+      lyText.textContent = cur ? cur.texte : '♪ ♪ ♪';                     // ligne chantée (ou intro)
+      lyTrad.textContent = cur ? (cur.traduction || '') : '';             // sa traduction
+      lyNext.textContent = PAROLES[i + 1] ? PAROLES[i + 1].texte : '';    // ligne d'après
+    } else {                                                              // mode mots doux
+      lyPrev.textContent = ''; lyNext.textContent = '';                   // pas de voisines
+      lyText.textContent = MOTS.length ? MOTS[((i % MOTS.length) + MOTS.length) % MOTS.length] : '♪'; // mot doux du moment
+      lyTrad.textContent = '';                                            // pas de traduction
+    }                                                                     // fin modes
+    fx(lyNow, { opacity: 0, y: 12, scale: .96 }, { opacity: 1, y: 0, scale: 1 }, { duration: .45, ease: 'back.out(1.4)' }); // petite apparition
+  }                                                                       // fin showLine
+  onTime = secs => {                                                      // appelé à chaque image pendant la musique
+    if (current !== 8) return;                                            // seulement sur l’écran musique
+    if (PAROLES.length) {                                                 // paroles synchronisées
+      let i = -1;                                                         // aucune ligne avant la première
+      while (i + 1 < PAROLES.length && PAROLES[i + 1].t <= secs + .15) i++; // dernière ligne commencée
+      showLine(i);                                                        // affiche
+    } else showLine(Math.floor(secs / (Number(C.dureeMotDoux) || 6)));    // un mot doux toutes les N secondes
+  };                                                                      // fin onTime
+  $('#mTitle').textContent = C.titreChanson || 'Notre chanson';           // titre de la chanson
+  $('#mArtist').textContent = C.artiste || '';                            // artiste
+  $('#musicYes').addEventListener('click', () => { togglePlay(true); goTo(8); }); // « Oui » → musique lancée TOUT DE SUITE (exigé par iPhone) + écran musique
+  $('#musicNo').addEventListener('click', () => {                         // « Pas maintenant »
+    const m = $('#musicNoMsg');                                           // zone de message
+    m.textContent = T.reponseNonMusique || 'D’accord… je la garde au chaud pour toi 🥺♡'; // réponse mignonne
+    const y = $('#musicYes');                                             // bouton oui
+    y.classList.remove('wiggle'); void y.offsetWidth; y.classList.add('wiggle'); // il gigote pour donner envie
+  });                                                                     // fin « non »
+  onEnter[8] = () => {                                                    // en arrivant sur l'écran musique
+    $('#mTitle').textContent = $('.player-title').textContent;            // même titre que le lecteur (chanson perso comprise)
+    lyIndex = -2; paint(); showLine(PAROLES.length ? -1 : 0);              // première ligne
+  };                                                                      // fin onEnter 8
+  musicPlay.addEventListener('click', () => togglePlay());                // ▶ / ❚❚
+  $('#musicRestart').addEventListener('click', () => {                    // ⏮ reprendre au début
+    if (useSynth) { Synth.stop(); setPlaying(false); startSynth(); }      // boîte à musique : relance
+    else if (audio) { audio.currentTime = 0; togglePlay(true); }          // fichier : retour à 0
+    lyIndex = -2; paint();                                                // rafraîchit
+  });                                                                     // fin début
+  function seekTo(ratio) {                                                // avance à un endroit de la chanson
+    if (useSynth || !audio || !audio.duration) return;                    // impossible avec la boîte à musique
+    audio.currentTime = Math.max(0, Math.min(1, ratio)) * audio.duration; // nouvelle position
+    paint();                                                              // rafraîchit
+  }                                                                       // fin seekTo
+  musicBarWrap.addEventListener('click', e => {                           // toucher la barre
+    const r = musicBarWrap.getBoundingClientRect();                       // position du rail
+    seekTo((e.clientX - r.left) / r.width);                               // va à cet endroit
+  });                                                                     // fin barre
+  musicBarWrap.addEventListener('keydown', e => {                         // clavier sur la barre
+    if (!audio || !audio.duration) return;                                // rien à faire
+    if (e.key === 'ArrowRight') { seekTo((audio.currentTime + 5) / audio.duration); e.preventDefault(); } // +5 s
+    if (e.key === 'ArrowLeft') { seekTo((audio.currentTime - 5) / audio.duration); e.preventDefault(); }  // −5 s
+  });                                                                     // fin clavier
+  let kisses = 0;                                                         // nombre de bisous envoyés
+  function sendKiss(x, y) {                                               // envoie un bisou
+    kisses++;                                                             // +1
+    burst(x, y, 10, { up: true, spread: 160 });                           // pluie de cœurs à l'endroit touché
+    vibrate(15);                                                          // petite vibration
+    $('#kissCount').textContent = (T.compteurBisous || '{n} bisou(s) envoyé(s) 💋').replace('{n}', kisses); // compteur
+  }                                                                       // fin sendKiss
+  musicStage.addEventListener('pointerdown', e => {                       // toucher la scène = bisou
+    if (e.target.closest('button, [role=slider], a')) return;             // sauf sur les boutons et la barre
+    sendKiss(e.clientX, e.clientY);                                       // bisou là où on touche
+  });                                                                     // fin toucher
+  $('#musicKiss').addEventListener('click', () => {                       // bouton 💋
+    const r = $('#musicKiss').getBoundingClientRect();                    // position du bouton
+    sendKiss(r.left + r.width / 2, r.top);                                // bisou depuis le bouton
+  });                                                                     // fin bouton bisou
+
+  /* ───── 11 ter. OUTIL DE SYNCHRO DES PAROLES (adresse + ?synchro=1) ───── */
+  const isSync = /[?&]synchro=/.test(location.search);                    // mode synchro ?
+  const syncRec = [];                                                     // lignes déjà calées
+  if (isSync) {                                                           // seulement en mode synchro
+    $('#syncPanel').hidden = false;                                       // affiche l'outil
+    $('#syncNext').addEventListener('click', () => {                      // « Ligne suivante »
+      const lines = $('#syncInput').value.split('\n').map(s => s.trim()).filter(Boolean); // lignes collées
+      if (!lines.length) { $('#syncState').textContent = 'Colle d’abord les paroles ♡'; return; } // rien à caler
+      if (syncRec.length >= lines.length) { $('#syncState').textContent = 'Terminé ! Copie le bloc ci-dessous ♡'; return; } // fini
+      const [texte, traduction = ''] = lines[syncRec.length].split('|').map(s => s.trim()); // texte | traduction
+      syncRec.push({ t: Math.round(songPos().secs * 10) / 10, texte, traduction }); // temps actuel arrondi à 0,1 s
+      $('#syncState').textContent = `Ligne ${syncRec.length} / ${lines.length} calée à ${fmt(songPos().secs)}`; // avancement
+      $('#syncOut').value = 'paroles: [\n' + syncRec.map(l => '  ' + JSON.stringify(l).replace(/"(t|texte|traduction)":/g, '$1: ') + ',').join('\n') + '\n],'; // bloc prêt à coller
+    });                                                                   // fin bouton
+  }                                                                       // fin mode synchro
 
   /* ───── 12. ÉTAPE 0 : ACCUEIL (prénom + photos / chanson perso) ───── */
   const askName = C.demanderPrenom !== false;                             // demander le prénom ?
@@ -749,6 +877,12 @@
     nameInput.value = savedName;                                          // pré-remplit le prénom
     chooseOwn(useOwn);                                                    // rétablit le choix
     if (!askOwn) chooseOwn(false);                                        // personnalisation désactivée
+    if (isSync) { applyName(savedName); return goTo(8); }                 // outil de synchro → directement l'écran musique
+    if (/[?&]photos=/.test(location.search)) {                            // « Changer les photos » depuis la fin
+      $('#ownBlock').hidden = false;                                      // montre la question
+      chooseOwn(true);                                                    // ouvre directement les vignettes
+      return goTo(0);                                                     // écran d'accueil
+    }                                                                     // fin changer les photos
     if ((!askName && !askOwn) || (isReplay && (savedName || !askName))) { // rien à demander, ou « Replay »
       applyName(askName ? savedName : '');                                // prénom mémorisé
       return goTo(1);                                                     // directement l'étape 1

@@ -16,7 +16,7 @@
   <script>
     (function () {                                                                  // petite fonction exécutée immédiatement
       var on = !(typeof CONFIG !== 'undefined' && CONFIG.effetHtmlBrut === false)    // effet actif sauf si désactivé dans config.js
-        && !/[?&]replay=/.test(location.search);                                     // et pas lors d'un « Replay »
+        && !/[?&](replay|photos|synchro)=/.test(location.search);                    // et pas lors d'un « Replay », d'un changement de photos ou de la synchro
       document.documentElement.className = on ? 'is-raw' : 'is-styled';              // classe d'état sur <html>
       if (!on) {                                                                     // si l'effet est désactivé…
         document.getElementById('mainCss').media = 'all';                            // …on allume le CSS tout de suite
@@ -419,8 +419,67 @@
         <div id="letterText" class="letter-text" aria-hidden="true"></div><!-- texte tapé lettre par lettre -->
         <p id="letterSr" class="sr-only"></p><!-- texte complet pour lecteurs d'écran -->
       </article><!-- fin lettre -->
-      <button id="replayBtn" class="btn btn-main" type="button" data-t="rejouer" hidden>Recommencer ♡</button><!-- rejouer -->
+      <div id="afterLetter" class="after-letter" hidden><!-- ce qui apparaît après la lettre -->
+        <div class="win win-ask-music"><!-- petite fenêtre question -->
+          <div class="titlebar"><span class="tb-title">♡ music.exe</span><span class="tb-btns" aria-hidden="true"><i>▁</i><i>☐</i><i>✕</i></span></div><!-- barre de titre -->
+          <div class="win-body"><!-- contenu -->
+            <p class="ask-text" data-t="questionMusique">Tu veux écouter notre chanson ? 🎧</p><!-- question -->
+            <div class="btn-row"><!-- choix -->
+              <button id="musicYes" class="btn btn-yes" type="button" data-t="ouiMusique">Oui ♡</button><!-- oui → écran musique -->
+              <button id="musicNo" class="btn btn-choice" type="button" data-t="nonMusique">Pas maintenant</button><!-- non -->
+            </div><!-- fin choix -->
+            <p id="musicNoMsg" class="date-msg" aria-live="polite"></p><!-- réponse mignonne si « non » -->
+          </div><!-- fin contenu -->
+        </div><!-- fin fenêtre -->
+        <div class="btn-row end-row"><!-- autres actions -->
+          <button class="btn btn-choice js-change-photos" type="button" data-t="changerPhotos">📷 Changer les photos</button><!-- remettre ses photos -->
+          <button class="btn btn-main js-replay" type="button" data-t="rejouer">Recommencer ♡</button><!-- rejouer -->
+        </div><!-- fin actions -->
+      </div><!-- fin après la lettre -->
     </section><!-- fin étape 7 -->
+
+    <!-- ── ÉTAPE 8 : NOTRE CHANSON (paroles + traduction + bisous) ── -->
+    <section class="step step-8" data-step="8" aria-labelledby="t8" hidden><!-- écran musique -->
+      <div id="musicStage" class="music-stage"><!-- scène (toucher = bisou) -->
+        <h1 id="t8" class="script-title music-title" tabindex="-1" data-focus data-t="titreMusique">Notre chanson</h1><!-- titre -->
+        <div class="record" aria-hidden="true"><!-- tourne-disque -->
+          <div class="record-disc"><img data-photo="pochette" alt=""></div><!-- disque avec votre photo au centre -->
+          <span class="record-arm"></span><!-- bras du tourne-disque -->
+          <span class="note-fly nf1">♪</span><span class="note-fly nf2">♫</span><span class="note-fly nf3">♡</span><!-- notes qui s'envolent -->
+        </div><!-- fin tourne-disque -->
+        <p class="music-song"><b id="mTitle">Notre chanson</b><span id="mArtist">Toi &amp; moi</span></p><!-- titre + artiste -->
+        <div id="musicBarWrap" class="music-bar" role="slider" tabindex="0" aria-label="Position dans la chanson" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="musicBar"></span></div><!-- barre (touchable pour avancer) -->
+        <p class="music-times"><span id="musicTime">0:00</span><span id="musicDur">--:--</span></p><!-- temps -->
+        <div class="music-ctrls"><!-- commandes -->
+          <button id="musicRestart" class="m-btn" type="button" aria-label="Reprendre la chanson au début">⏮</button><!-- début -->
+          <button id="musicPlay" class="m-btn m-play" type="button" aria-pressed="false" aria-label="Lancer la chanson"><span class="ico" aria-hidden="true">▶</span></button><!-- lecture / pause -->
+          <button id="musicKiss" class="m-btn" type="button" aria-label="Envoyer un bisou">💋</button><!-- bisou -->
+        </div><!-- fin commandes -->
+        <div class="lyrics" aria-live="polite"><!-- paroles synchronisées -->
+          <p class="ly-prev" aria-hidden="true"></p><!-- ligne précédente -->
+          <p class="ly-now"><span class="ly-text"></span><span class="ly-trad"></span></p><!-- ligne actuelle + traduction -->
+          <p class="ly-next" aria-hidden="true"></p><!-- ligne suivante -->
+        </div><!-- fin paroles -->
+        <p id="kissCount" class="kiss-count" data-t="consigneBisous">touche l'écran pour m'envoyer des bisous 💋</p><!-- compteur de bisous -->
+        <div class="btn-row end-row"><!-- actions -->
+          <button class="btn btn-choice js-change-photos" type="button" data-t="changerPhotos">📷 Changer les photos</button><!-- remettre ses photos -->
+          <button class="btn btn-main js-replay" type="button" data-t="rejouer">Recommencer ♡</button><!-- rejouer -->
+        </div><!-- fin actions -->
+      </div><!-- fin scène -->
+
+      <div id="syncPanel" class="win sync-panel" hidden><!-- outil de synchro des paroles (adresse + ?synchro=1) -->
+        <div class="titlebar"><span class="tb-title">♡ synchro.exe</span><span class="tb-btns" aria-hidden="true"><i>✕</i></span></div><!-- barre de titre -->
+        <div class="win-body sync-body"><!-- contenu -->
+          <label for="syncInput">1. Colle les paroles, une ligne par ligne : <b>texte | traduction</b></label><!-- consigne 1 -->
+          <textarea id="syncInput" rows="6" placeholder="ligne originale | traduction en français"></textarea><!-- paroles à caler -->
+          <p>2. Lance la musique ▶, puis touche le bouton au <b>début</b> de chaque ligne.</p><!-- consigne 2 -->
+          <button id="syncNext" class="btn btn-main" type="button">Ligne suivante ♪</button><!-- enregistre le temps -->
+          <p id="syncState" aria-live="polite"></p><!-- avancement -->
+          <label for="syncOut">3. Copie ce bloc dans config.js (à la place de <b>paroles: [ ... ],</b>)</label><!-- consigne 3 -->
+          <textarea id="syncOut" rows="6" readonly></textarea><!-- résultat à copier -->
+        </div><!-- fin contenu -->
+      </div><!-- fin outil -->
+    </section><!-- fin étape 8 -->
 
   </main><!-- fin application -->
 

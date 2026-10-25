@@ -33,7 +33,23 @@ const CONFIG = {                                           // objet global lu pa
     "Alors voici mon dernier secret : je te choisirais à chaque date du calendrier. Aujourd'hui, demain, et tous les jours d'après. ♡" // paragraphe 3
   ],                                                       // fin de la lettre
 
-  effetHtmlBrut: true,                                     // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
+  paroles: [                                               // paroles synchronisées de la chanson (écran musique après la lettre)
+    // { t: 12.5, texte: "ligne originale de la chanson", traduction: "sa traduction en français" },
+    // t = seconde où la ligne commence. Astuce : ouvre le site avec ?synchro=1 à la fin de l'adresse
+    // pour taper le rythme toi-même : le site te donne le bloc tout prêt à coller ici.
+  ],                                                       // vide = les « motsDoux » ci-dessous défilent à la place
+
+  motsDoux: [                                              // petits mots qui défilent pendant la musique (si pas de paroles)
+    "Tu es mon endroit préféré ♡",                         // mot 1
+    "Avec toi, même les jours gris sont roses",            // mot 2
+    "Je te choisirais encore, et encore",                  // mot 3
+    "Ton sourire est ma chanson préférée",                 // mot 4
+    "Merci d'exister ♡",                                   // mot 5
+    "Toi + moi = mon histoire préférée"                    // mot 6
+  ],                                                       // fin des mots doux
+  dureeMotDoux: 6,                                         // secondes entre deux mots doux
+
+  effetHtmlBrut: true,                                    // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
   dureeHtmlBrut: 1500,                                     // durée de l'effet HTML brut en millisecondes
 
   textes: {                                                // tous les petits textes du parcours (facultatif à modifier)
@@ -77,6 +93,14 @@ const CONFIG = {                                           // objet global lu pa
     secret2: "Gratte le cœur pour le découvrir ♡",         // consigne de l'étape 6
     gratteMoi: "gratte-moi ♡",                             // texte écrit sur le cœur à gratter
     signature: "Pour toujours à toi,",                     // formule avant ta signature (étape 7)
+    questionMusique: "Tu veux écouter notre chanson ? 🎧",  // question après la lettre
+    ouiMusique: "Oui ♡",                                   // bouton oui (écran musique)
+    nonMusique: "Pas maintenant",                          // bouton non
+    reponseNonMusique: "D'accord… je la garde au chaud pour toi 🥺♡", // message mignon si « non »
+    changerPhotos: "📷 Changer les photos",                // bouton pour remettre ses propres photos
+    titreMusique: "Notre chanson",                         // titre de l'écran musique
+    consigneBisous: "touche l'écran pour m'envoyer des bisous 💋", // petite consigne
+    compteurBisous: "{n} bisou(s) envoyé(s) 💋",            // compteur ({n} = nombre)
     continuer: "Continuer ♡",                              // texte des boutons « continuer »
     rejouer: "Recommencer ♡"                               // texte du bouton final
   }                                                        // fin des textes

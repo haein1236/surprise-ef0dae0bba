@@ -98,3 +98,19 @@ git push
 5. 📱 **Teste TOUJOURS le QR avec ton téléphone avant de l'envoyer.** Si tu changes l'adresse du site, refais le QR.
 
 Conseils : garde un rose assez foncé pour les points (le défaut `#d6457e` est bien), un fond blanc pour l'impression, et au moins 3 cm de côté une fois imprimé.
+
+---
+
+## Écran « Notre chanson » (après la lettre)
+
+Après la lettre, le site demande « Tu veux écouter notre chanson ? 🎧 ».
+- **Oui :** le disque tourne avec votre photo, la musique démarre, et les **paroles + leur traduction** défilent en rythme. Toucher l'écran envoie des bisous 💋.
+- Sans paroles dans `config.js`, ce sont les `motsDoux` qui défilent.
+- Les boutons **📷 Changer les photos** et **Recommencer ♡** sont aussi proposés.
+
+### Ajouter les paroles et la traduction
+1. Ouvre le site avec `?synchro=1` à la fin de l'adresse (ex : `https://surprise-ef0dae0bba.vercel.app/?synchro=1`).
+2. Colle les paroles, une ligne par ligne, au format `texte original | traduction`.
+3. Lance la musique ▶, puis touche **Ligne suivante ♪** au début de chaque ligne chantée.
+4. Copie le bloc `paroles: [ ... ],` qui s'affiche et colle-le dans `config.js` à la place de l'existant.
+5. Republie (git push + vercel deploy --prod).
