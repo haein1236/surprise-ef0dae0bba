@@ -1,0 +1,583 @@
+/* ==========================================================================
+   style.css — univers kawaii « Y2K / vieux bureau d'ordinateur »
+   ========================================================================== */
+
+/* ───── 0. EFFET HTML BRUT : dès que ce CSS s'allume, le bloc brut disparaît ───── */
+.raw-intro { display: none !important; }                       /* cache le bloc « HTML brut » */
+[hidden] { display: none !important; }                         /* l'attribut hidden gagne toujours */
+
+/* ───── 1. VARIABLES DE COULEURS ───── */
+:root {                                                        /* variables globales */
+  --cream: #fbf1de;                                            /* crème */
+  --pink: #f9a8c4;                                             /* rose bonbon */
+  --pink-d: #ef7fa8;                                           /* rose plus soutenu */
+  --pink-l: #ffd6e6;                                           /* rose très clair */
+  --sage: #a9c08f;                                             /* vert sauge */
+  --sage-l: #b9cca3;                                           /* vert sauge clair */
+  --green: #8db474;                                            /* vert des barres de titre */
+  --green-d: #5c7f4a;                                          /* vert foncé */
+  --brown: #6b4a3a;                                            /* marron des contours */
+  --red: #b3262e;                                              /* rouge scrapbook */
+  --shadow: 0 6px 0 rgba(107, 74, 58, .22), 0 18px 40px rgba(107, 74, 58, .18); /* ombre rétro + douce */
+  --f-hand: 'Patrick Hand', 'Comic Sans MS', cursive;          /* police manuscrite */
+  --f-script: 'Great Vibes', cursive;                          /* police script des titres */
+  --f-pixel: 'Press Start 2P', monospace;                      /* police pixel */
+  --f-body: 'Nunito', system-ui, sans-serif;                   /* police du texte courant */
+  --heart-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 100 100'%3E%3Cpath d='M50 88C20 68 4 50 4 31C4 17 15 7 28 7C38 7 46 13 50 22C54 13 62 7 72 7C85 7 96 17 96 31C96 50 80 68 50 88Z' fill='%23f9a8c4' stroke='%236b4a3a' stroke-width='8'/%3E%3C/svg%3E") 4 4; /* curseur cœur */
+  --heart-cursor-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 100 100'%3E%3Cpath d='M50 88C20 68 4 50 4 31C4 17 15 7 28 7C38 7 46 13 50 22C54 13 62 7 72 7C85 7 96 17 96 31C96 50 80 68 50 88Z' fill='%23ef7fa8' stroke='%236b4a3a' stroke-width='8'/%3E%3C/svg%3E") 4 4; /* curseur cœur au survol */
+}                                                              /* fin variables */
+
+/* ───── 2. BASE ───── */
+*, *::before, *::after { box-sizing: border-box; }             /* tailles prévisibles */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; } /* pas de grossissement auto du texte sur iOS */
+body {                                                         /* corps de page */
+  margin: 0;                                                   /* pas de marge */
+  min-height: 100vh;                                           /* hauteur mini (anciens navigateurs) */
+  min-height: 100svh;                                          /* hauteur mini mobile fiable */
+  font-family: var(--f-body);                                  /* police courante */
+  color: var(--brown);                                         /* texte marron */
+  background: var(--cream);                                    /* fond de secours */
+  overflow-x: hidden;                                          /* jamais de scroll horizontal */
+  -webkit-tap-highlight-color: transparent;                    /* pas de flash gris au toucher */
+}                                                              /* fin body */
+img { max-width: 100%; display: block; }                       /* images fluides */
+button { font: inherit; color: inherit; touch-action: manipulation; } /* boutons : police héritée, pas de double-tap zoom */
+h1, p, figure { margin: 0; }                                   /* remise à zéro des marges */
+.sr-only {                                                     /* visible seulement pour les lecteurs d'écran */
+  position: absolute; width: 1px; height: 1px; padding: 0;     /* minuscule */
+  margin: -1px; overflow: hidden; clip: rect(0 0 0 0);         /* découpé */
+  white-space: nowrap; border: 0;                              /* sur une ligne, sans bord */
+}                                                              /* fin sr-only */
+:focus-visible { outline: 3px dashed var(--red); outline-offset: 3px; } /* focus clavier bien visible */
+[data-focus]:focus { outline: none; }                          /* pas de cadre sur les titres focalisés par le script */
+
+@media (hover: hover) and (pointer: fine) {                    /* uniquement avec une souris (desktop) */
+  body { cursor: var(--heart-cursor), auto; }                  /* petit curseur cœur */
+  button, a, .bphoto, canvas { cursor: var(--heart-cursor-on), pointer; } /* cœur plus rose sur ce qui est cliquable */
+}                                                              /* fin curseur */
+
+/* ───── 3. FONDS ───── */
+.bgs { position: fixed; inset: 0; z-index: 0; pointer-events: none; } /* calques fixés derrière tout */
+.bg { position: absolute; inset: 0; opacity: 0; transition: opacity .9s ease; overflow: hidden; } /* calque invisible par défaut */
+body[data-bg="sky"] .bg-sky,                                   /* fond ciel actif… */
+body[data-bg="check"] .bg-check,                               /* …ou carreaux… */
+body[data-bg="sage"] .bg-sage { opacity: 1; }                  /* …ou sauge : visible */
+.bg-sky {                                                      /* ciel rose */
+  background:                                                  /* superposition de dégradés */
+    radial-gradient(120% 60% at 50% 110%, #ffe6ef 0 40%, transparent 70%), /* lueur claire en bas */
+    linear-gradient(180deg, #ffc7dc 0%, #fbd3e2 45%, #f9b9d0 100%); /* dégradé rose */
+}                                                              /* fin ciel */
+.cloud {                                                       /* nuage (corps) */
+  position: absolute; width: 130px; height: 42px;              /* taille */
+  background: #fff; border-radius: 42px; opacity: .8;          /* blanc arrondi */
+  animation: drift 38s linear infinite;                        /* dérive lente */
+}                                                              /* fin nuage */
+.cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; } /* bosses du nuage */
+.cloud::before { width: 54px; height: 54px; top: -26px; left: 18px; }  /* petite bosse */
+.cloud::after { width: 72px; height: 72px; top: -40px; left: 48px; }   /* grande bosse */
+.c1 { top: 9%; left: -10%; }                                   /* nuage 1 */
+.c2 { top: 32%; left: 60%; transform: scale(.7); animation-duration: 46s; animation-delay: -12s; } /* nuage 2 */
+.c3 { top: 64%; left: 10%; transform: scale(1.2); animation-duration: 52s; animation-delay: -30s; } /* nuage 3 */
+.c4 { top: 84%; left: 70%; transform: scale(.85); animation-duration: 40s; animation-delay: -6s; } /* nuage 4 */
+@keyframes drift { from { translate: -20vw 0; } to { translate: 120vw 0; } } /* traversée de l'écran */
+.bg-check {                                                    /* carreaux vichy vert / crème */
+  background-color: var(--cream);                              /* base crème */
+  background-image:                                            /* deux bandes croisées */
+    linear-gradient(90deg, rgba(169, 192, 143, .5) 50%, transparent 50%), /* bandes verticales */
+    linear-gradient(rgba(169, 192, 143, .5) 50%, transparent 50%);       /* bandes horizontales */
+  background-size: 44px 44px;                                  /* taille des carreaux */
+}                                                              /* fin carreaux */
+.bg-sage {                                                     /* vert sauge doux */
+  background-color: var(--sage-l);                             /* base sauge */
+  background-image: radial-gradient(rgba(255, 255, 255, .35) 1.5px, transparent 2px); /* petits pois clairs */
+  background-size: 22px 22px;                                  /* espacement des pois */
+}                                                              /* fin sauge */
+
+/* ───── 4. MISE EN PAGE DES ÉTAPES ───── */
+#app { position: relative; z-index: 1; }                       /* application au-dessus des fonds */
+.step {                                                        /* un écran */
+  position: relative;                                          /* repère pour les décorations */
+  min-height: 100vh; min-height: 100svh;                       /* plein écran */
+  display: flex; flex-direction: column;                       /* colonne */
+  align-items: center; justify-content: center;                /* centré */
+  gap: 18px;                                                   /* espace entre blocs */
+  padding: max(24px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); /* marges + zones sûres iPhone */
+}                                                              /* fin étape */
+
+/* ───── 5. COMPOSANTS COMMUNS ───── */
+.win {                                                         /* fenêtre style Windows 98 kawaii */
+  position: relative;                                          /* repère */
+  background: var(--cream);                                    /* fond crème */
+  border: 2px solid var(--brown);                              /* bordure marron fine */
+  border-radius: 14px;                                         /* coins arrondis */
+  box-shadow: var(--shadow);                                   /* ombre rétro */
+}                                                              /* fin fenêtre */
+.titlebar {                                                    /* barre de titre verte */
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; /* titre à gauche, boutons à droite */
+  padding: 6px 8px 6px 12px;                                   /* marges internes */
+  background: linear-gradient(#a8c78d, var(--green));          /* vert brillant */
+  border-bottom: 2px solid var(--brown);                       /* séparation */
+  border-radius: 12px 12px 0 0;                                /* coins hauts arrondis */
+  color: #fff; font: 9px/1.4 var(--f-pixel);                   /* texte pixel blanc */
+  text-shadow: 1px 1px 0 rgba(107, 74, 58, .55);               /* petite ombre pixel */
+}                                                              /* fin barre */
+.tb-btns { display: flex; gap: 4px; }                          /* groupe ▁ ☐ ✕ */
+.tb-btns i {                                                   /* un bouton de barre */
+  font-style: normal; width: 22px; height: 20px;               /* taille */
+  display: grid; place-items: center;                          /* symbole centré */
+  background: var(--cream); color: var(--brown);               /* crème + marron */
+  border: 1.5px solid var(--brown); border-radius: 5px;        /* bord */
+  font: 700 11px/1 system-ui, sans-serif; text-shadow: none;   /* police système */
+}                                                              /* fin bouton barre */
+.win-body { padding: 22px 18px 24px; text-align: center; }     /* contenu de fenêtre */
+
+.btn {                                                         /* bouton kawaii */
+  display: inline-flex; align-items: center; justify-content: center; /* contenu centré */
+  min-height: 48px; min-width: 44px;                           /* zone tactile ≥ 44 px */
+  padding: 10px 24px;                                          /* marges */
+  border: 2px solid var(--brown); border-radius: 999px;        /* pilule */
+  font: 1.25rem/1 var(--f-hand);                               /* manuscrit */
+  color: var(--brown);                                         /* texte marron */
+  box-shadow: 0 4px 0 var(--brown);                            /* relief rétro */
+  cursor: pointer;                                             /* main */
+  transition: box-shadow .15s ease, filter .15s ease;          /* petites transitions */
+  user-select: none; -webkit-user-select: none;                /* pas de sélection de texte */
+}                                                              /* fin bouton */
+.btn:hover { filter: brightness(1.04) saturate(1.1); }         /* survol */
+.btn:active { box-shadow: 0 1px 0 var(--brown); translate: 0 3px; } /* enfoncé */
+.btn-yes { background: #b9d99b; }                              /* vert */
+.btn-no { background: var(--pink); position: relative; z-index: 6; } /* rose, au-dessus de tout */
+.btn-main { background: var(--pink); }                         /* bouton principal rose */
+.btn-next { margin-top: 4px; }                                 /* espace au-dessus */
+.link-btn {                                                    /* bouton discret façon lien */
+  background: none; border: 0; padding: 12px; min-height: 44px; /* zone tactile */
+  font: 1rem var(--f-hand); color: var(--brown); opacity: .75; /* discret */
+  text-decoration: underline dotted; cursor: pointer;          /* souligné pointillé */
+}                                                              /* fin lien-bouton */
+
+.mascot { display: block; overflow: visible; }                 /* mascottes SVG */
+.washi {                                                       /* scotch washi */
+  position: absolute; display: block;                          /* posé librement */
+  width: 88px; height: 24px;                                   /* taille par défaut */
+  opacity: .9;                                                 /* semi-transparent */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12);                    /* légère ombre */
+  clip-path: polygon(0 0, 100% 0, 97% 25%, 100% 50%, 97% 75%, 100% 100%, 0 100%, 3% 75%, 0 50%, 3% 25%); /* bords dentelés */
+}                                                              /* fin washi */
+.washi-pink { background: repeating-linear-gradient(45deg, rgba(249, 168, 196, .9) 0 6px, rgba(255, 255, 255, .9) 6px 12px); } /* rayures roses */
+.washi-sage { background: repeating-linear-gradient(-45deg, rgba(169, 192, 143, .9) 0 6px, rgba(251, 241, 222, .9) 6px 12px); } /* rayures sauge */
+.washi-dots { background: radial-gradient(#fff 1.6px, transparent 2px) 0 0/9px 9px, rgba(239, 127, 168, .85); } /* pois blancs sur rose */
+.washi-gingham {                                               /* vichy rose */
+  background-color: rgba(255, 255, 255, .85);                  /* base blanche */
+  background-image: linear-gradient(90deg, rgba(249, 168, 196, .6) 50%, transparent 50%), linear-gradient(rgba(249, 168, 196, .6) 50%, transparent 50%); /* carreaux */
+  background-size: 10px 10px;                                  /* petits carreaux */
+}                                                              /* fin vichy */
+
+.fx-heart { position: fixed; z-index: 9999; pointer-events: none; will-change: transform, opacity; } /* cœurs animés */
+.fx-heart svg { width: 100%; height: 100%; display: block; }   /* svg plein */
+
+/* ───── 6. ÉTAPE 1 : YOU'VE GOT MAIL ───── */
+.s1-inner { display: flex; flex-direction: column; align-items: center; gap: 6px; } /* colonne */
+.kitten-hide { width: 108px; animation: bob 3s ease-in-out infinite; } /* chaton qui flotte */
+.script-title {                                                /* titre Great Vibes */
+  font: 400 clamp(2.9rem, 13vw, 4.6rem)/1.05 var(--f-script);  /* grand script */
+  color: var(--red);                                           /* rouge */
+  text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(249, 168, 196, .7); /* contour blanc + ombre rose */
+  text-align: center; margin-bottom: 18px;                     /* centré */
+}                                                              /* fin titre */
+.hint { font: 1.25rem var(--f-hand); opacity: .85; margin-top: 18px; animation: pulse 1.8s ease-in-out infinite; } /* consigne qui pulse */
+
+.gift {                                                        /* boîte cadeau (bouton) */
+  position: relative; display: block;                          /* repère */
+  width: min(62vw, 250px); aspect-ratio: 1 / .9;               /* taille */
+  background: none; border: 0; padding: 0;                     /* pas de style bouton */
+  cursor: pointer;                                             /* main */
+  animation: bob 2.6s ease-in-out infinite;                    /* flotte doucement */
+}                                                              /* fin boîte */
+.gift.is-shaking { animation: shake .12s linear 5; }           /* tremblement au clic */
+.gift.is-open { animation: none; }                             /* arrêt du flottement */
+.gift-base {                                                   /* corps de la boîte */
+  position: absolute; left: 8%; right: 8%; bottom: 0; height: 60%; /* placement */
+  background: linear-gradient(90deg, #7fa865 0%, #9cc282 45%, #86ae6c 100%); /* vert avec volume */
+  border: 2.5px solid var(--brown); border-radius: 6px 6px 14px 14px; /* bord */
+  box-shadow: inset -16px 0 0 rgba(0, 0, 0, .08), 0 10px 0 rgba(107, 74, 58, .18); /* face ombrée = look 3D */
+}                                                              /* fin corps */
+.gift-ribbon {                                                 /* ruban vertical sombre */
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 16%; /* au centre */
+  transform: translateX(-50%);                                 /* centrage exact */
+  background: linear-gradient(90deg, #3f5b34, #557a46, #3f5b34); /* ruban satiné */
+  border-inline: 2px solid var(--brown);                       /* bords */
+}                                                              /* fin ruban */
+.gift-clasp {                                                  /* fermoir doré */
+  position: absolute; left: 50%; top: -2px; width: 24%; height: 18%; /* sous le couvercle */
+  transform: translateX(-50%);                                 /* centré */
+  background: linear-gradient(#ffe38a, #d9a93a);               /* or */
+  border: 2px solid var(--brown); border-radius: 0 0 9px 9px;  /* forme */
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .5);           /* reflet */
+}                                                              /* fin fermoir */
+.gift-clasp::after { content: ''; position: absolute; left: 50%; top: 40%; width: 6px; height: 6px; border-radius: 50%; background: var(--brown); transform: translateX(-50%); } /* trou de serrure */
+.gift-stamp {                                                  /* timbre */
+  position: absolute; right: 8%; bottom: 12%; width: 23%; aspect-ratio: 1; /* coin bas droit */
+  background: #fff8ef; padding: 12%;                           /* papier */
+  border: 2px dashed #e7a3b9; box-shadow: 0 0 0 3px #fff8ef, 0 2px 4px rgba(0, 0, 0, .15); /* bords dentelés */
+  transform: rotate(8deg);                                     /* penché */
+}                                                              /* fin timbre */
+.gift-stamp svg { width: 100%; height: 100%; color: var(--pink-d); } /* cœur du timbre */
+.gift-lid {                                                    /* couvercle */
+  position: absolute; left: 2%; right: 2%; top: 24%; height: 22%; z-index: 2; /* au-dessus du corps */
+  background: linear-gradient(90deg, #8ab570, #a9cb8e 45%, #91b977); /* vert clair */
+  border: 2.5px solid var(--brown); border-radius: 8px;        /* bord */
+  transform-origin: 12% 100%;                                  /* pivot à gauche */
+  transition: transform .75s cubic-bezier(.34, 1.56, .64, 1);  /* ouverture avec rebond */
+}                                                              /* fin couvercle */
+.gift-lid::before {                                            /* face du dessus (perspective) */
+  content: ''; position: absolute; left: 4%; right: 4%; bottom: 100%; height: 34%; /* au-dessus */
+  background: #b6d59b; border: 2.5px solid var(--brown); border-bottom: 0; /* plus clair */
+  border-radius: 6px 6px 0 0; transform: perspective(200px) rotateX(40deg); transform-origin: bottom; /* effet 3D */
+}                                                              /* fin dessus */
+.gift-lid-ribbon { position: absolute; left: 50%; top: 0; bottom: 0; width: 15.5%; transform: translateX(-50%); background: #4a6a3d; border-inline: 2px solid var(--brown); } /* ruban du couvercle */
+.gift-bow { position: absolute; left: 50%; bottom: 112%; width: 46%; height: 64%; transform: translateX(-50%); } /* nœud */
+.gift-bow::before, .gift-bow::after {                          /* deux boucles */
+  content: ''; position: absolute; bottom: 0; width: 52%; height: 100%; /* taille */
+  background: #4f6f42; border: 2.5px solid var(--brown);       /* ruban sombre */
+}                                                              /* fin boucles */
+.gift-bow::before { left: 0; border-radius: 70% 30% 10% 70%; transform: rotate(-18deg); transform-origin: right bottom; } /* boucle gauche */
+.gift-bow::after { right: 0; border-radius: 30% 70% 70% 10%; transform: rotate(18deg); transform-origin: left bottom; } /* boucle droite */
+.gift.is-open .gift-lid { transform: translate(-6%, -95%) rotate(-26deg); } /* couvercle qui s'ouvre */
+.gift-glow {                                                   /* halo rose */
+  position: absolute; left: 50%; top: 40%; width: 10%; aspect-ratio: 1; /* au centre */
+  border-radius: 50%; background: radial-gradient(#fff, rgba(249, 168, 196, .8) 40%, transparent 70%); /* lumière */
+  transform: translate(-50%, -50%) scale(0); opacity: 0;       /* caché */
+  transition: transform .8s ease .25s, opacity .8s ease .25s;  /* apparition */
+}                                                              /* fin halo */
+.gift.is-open .gift-glow { transform: translate(-50%, -50%) scale(12); opacity: 1; } /* halo qui s'étend */
+.float-heart { position: absolute; color: #fff; opacity: .85; animation: bob 4s ease-in-out infinite; } /* cœurs décoratifs */
+.fh1 { width: 34px; top: 12%; left: 10%; }                     /* cœur 1 */
+.fh2 { width: 22px; top: 22%; right: 12%; color: var(--pink-d); animation-delay: -1.5s; } /* cœur 2 */
+.fh3 { width: 26px; bottom: 14%; left: 16%; color: var(--red); animation-delay: -2.4s; image-rendering: pixelated; } /* cœur pixel */
+
+/* ───── 7. ÉTAPE 2 : ARE YOU INTERESTED TO KNOW? ───── */
+.ask-wrap { position: relative; width: min(100%, 400px); margin: 80px auto 60px; } /* zone fenêtre + déco */
+.win-main { z-index: 2; }                                      /* fenêtre au-dessus des erreurs */
+.ask-body { padding: 26px 18px 28px; }                         /* marges */
+.alert-icon {                                                  /* bulle verte avec « ! » */
+  position: relative; width: 64px; height: 64px; margin: 0 auto 14px; /* taille */
+  display: grid; place-items: center;                          /* « ! » centré */
+  background: #9cc283; border: 2.5px solid var(--brown); border-radius: 50%; /* rond vert */
+  box-shadow: 0 4px 0 rgba(107, 74, 58, .25);                  /* relief */
+  color: #fff;                                                 /* « ! » blanc */
+}                                                              /* fin bulle */
+.alert-icon::after { content: ''; position: absolute; right: 2px; bottom: -6px; width: 16px; height: 16px; background: #9cc283; border-right: 2.5px solid var(--brown); border-bottom: 2.5px solid var(--brown); transform: rotate(30deg) skew(10deg); border-radius: 0 0 6px 0; z-index: -1; } /* queue de bulle */
+.alert-icon svg { width: 18px; height: 32px; }                 /* « ! » pixel */
+.ask-text { font: 1.7rem/1.2 var(--f-hand); margin-bottom: 22px; } /* question manuscrite */
+.btn-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; } /* boutons côte à côte */
+.err-stack { position: absolute; inset: 0; z-index: 1; pointer-events: none; } /* pile derrière la fenêtre */
+.win-err {                                                     /* fenêtre d'erreur */
+  position: absolute; width: 250px; pointer-events: auto;      /* taille fixe */
+  top: calc(var(--i) * -17px);                                 /* décalée vers le haut */
+  left: calc(50% - 125px + var(--dx, 0px));                    /* décalage gauche / droite */
+  box-shadow: 0 5px 0 rgba(107, 74, 58, .2), 0 12px 24px rgba(107, 74, 58, .2); /* ombre */
+}                                                              /* fin fenêtre d'erreur */
+.win-err .titlebar { background: linear-gradient(#f7b9cf, var(--pink-d)); } /* barre rose pour l'erreur */
+.err-body { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; padding: 14px; text-align: left; font: 1rem var(--f-hand); } /* icône + texte */
+.err-icon { width: 34px; height: 34px; border-radius: 50%; background: var(--pink); border: 2px solid var(--brown); display: grid; place-items: center; color: #fff; } /* icône ronde */
+.err-icon svg { width: 10px; height: 18px; }                   /* « ! » */
+.btn-ok { grid-column: 1 / -1; justify-self: end; min-height: 36px; padding: 4px 18px; font-size: 1rem; background: #fff; box-shadow: 0 3px 0 var(--brown); } /* bouton OK */
+.deco-bear { position: absolute; width: 104px; left: -12px; top: -92px; z-index: 3; transform: rotate(-8deg); } /* ourson en haut à gauche */
+.deco-kitten { position: absolute; width: 96px; right: -10px; bottom: -70px; z-index: 3; transform: rotate(6deg); } /* chaton en bas à droite */
+.s2-tape { top: -10px; right: 34px; transform: rotate(14deg); z-index: 3; } /* scotch à carreaux */
+.mini-heart { position: absolute; color: var(--pink-d); z-index: 3; animation: bob 3.4s ease-in-out infinite; } /* cœurs roses */
+.mh1 { width: 26px; top: -46px; right: 6px; }                  /* cœur 1 */
+.mh2 { width: 18px; bottom: -34px; left: 20px; animation-delay: -1s; } /* cœur 2 */
+.mh3 { width: 22px; top: 44%; left: -18px; color: var(--red); animation-delay: -2s; } /* cœur pixel */
+
+/* ───── 8. ÉTAPE 3 : WHEN DO I CHOOSE YOU? ───── */
+.win-date { width: min(100%, 400px); }                         /* largeur fenêtre */
+.win-date.shake { animation: shakeX .5s cubic-bezier(.36, .07, .19, .97); } /* tremble si erreur */
+.date-body { padding: 20px 18px 22px; display: flex; flex-direction: column; align-items: center; gap: 12px; } /* colonne */
+.date-title { font: 400 2.5rem/1.05 var(--f-script); color: var(--red); } /* titre script */
+.date-sub { font: 1.15rem var(--f-hand); opacity: .85; margin-top: -6px; } /* sous-titre */
+.bubble {                                                      /* bulle de dialogue */
+  position: relative; display: flex; align-items: center; gap: 8px; /* cœur + texte */
+  background: #fff; border: 2px solid var(--brown); border-radius: 18px; /* bulle blanche */
+  padding: 8px 14px; font: 1.05rem var(--f-hand);              /* texte */
+  box-shadow: 0 3px 0 rgba(107, 74, 58, .2);                   /* relief */
+}                                                              /* fin bulle */
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 14px; height: 14px; background: #fff; border-right: 2px solid var(--brown); border-bottom: 2px solid var(--brown); transform: translateX(-50%) rotate(45deg); } /* pointe de bulle */
+.bubble svg { width: 20px; height: 20px; color: var(--pink-d); flex: none; animation: pulse 1.4s ease-in-out infinite; } /* cœur qui bat */
+.date-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; } /* champs en ligne */
+.date-sep { font: 1.6rem var(--f-hand); opacity: .6; }         /* « / » */
+.df {                                                          /* un champ de date */
+  min-width: 64px; min-height: 52px; padding: 6px 8px;         /* zone tactile */
+  background: #fff; border: 2px solid var(--brown); border-radius: 10px; /* case blanche */
+  font: 18px var(--f-pixel); letter-spacing: 1px;              /* chiffres pixel (≥ 16 px : pas de zoom iOS) */
+  cursor: pointer; box-shadow: inset 0 3px 0 rgba(107, 74, 58, .08); /* creux */
+}                                                              /* fin champ */
+.df-year { min-width: 96px; }                                  /* champ année plus large */
+.df.is-empty { color: rgba(107, 74, 58, .35); }                /* placeholder pâle */
+.df.is-active { border-color: var(--pink-d); box-shadow: 0 0 0 3px var(--pink-l), inset 0 3px 0 rgba(107, 74, 58, .08); } /* champ actif rose */
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: min(100%, 260px); } /* pavé 3 colonnes */
+.key {                                                         /* touche */
+  min-height: 52px;                                            /* zone tactile */
+  border: 2px solid var(--brown); border-radius: 14px;         /* bord */
+  font: 1.6rem/1 var(--f-hand);                                /* chiffres manuscrits */
+  box-shadow: 0 4px 0 var(--brown); cursor: pointer;           /* relief */
+}                                                              /* fin touche */
+.key:nth-child(odd) { background: #c5dfae; }                   /* touches vertes (alternées) */
+.key:nth-child(even) { background: var(--pink); }              /* touches roses (alternées) */
+.key:active { box-shadow: 0 1px 0 var(--brown); translate: 0 3px; } /* touche enfoncée */
+.date-msg { min-height: 1.5em; font: 1.2rem var(--f-hand); color: var(--red); } /* message */
+.date-msg.ok { color: var(--green-d); }                        /* message réussite en vert */
+
+/* ───── 9. ÉTAPE 4 : SONG FOR YOU (scrapbook) ───── */
+.scrap {                                                       /* collage aux proportions fixes */
+  position: relative;                                          /* repère */
+  width: min(100%, 500px, calc((100svh - 130px) * .643));      /* s'adapte à l'écran */
+  aspect-ratio: 9 / 14;                                        /* format portrait */
+  container-type: inline-size;                                 /* unités cqw = % de la largeur */
+}                                                              /* fin collage */
+.scrap > * { position: absolute; }                             /* tout est posé librement */
+.paper-shadow { inset: 1.5% 2%; filter: drop-shadow(0 6px 10px rgba(107, 74, 58, .28)); } /* ombre du papier */
+.paper {                                                       /* papier crème */
+  position: absolute; inset: 0;                                /* plein */
+  background-color: var(--cream);                              /* crème */
+  background-image: radial-gradient(rgba(107, 74, 58, .05) 1px, transparent 1.5px); /* grain léger */
+  background-size: 6px 6px;                                    /* taille du grain */
+}                                                              /* fin papier */
+.bit { width: 22%; aspect-ratio: 1.3; opacity: .9; }           /* morceau de papier déchiré */
+.b1 { top: 9%; left: 2%; background: var(--pink-l); transform: rotate(-12deg); } /* morceau rose */
+.b2 { top: 44%; right: 1%; background: #e3edd6; transform: rotate(9deg); } /* morceau sauge */
+.b3 { top: 64%; left: 30%; width: 34%; background: #fff7e8; transform: rotate(-4deg); } /* morceau crème */
+.scrap-title {                                                 /* titre « Song For You » */
+  top: 2.5%; left: 0; right: 0; text-align: center;            /* en haut */
+  font: 400 13cqw/1 var(--f-script); color: var(--red);        /* script rouge */
+  text-shadow: 1px 1px 0 #fff;                                 /* liseré */
+  z-index: 3;                                                  /* au-dessus */
+}                                                              /* fin titre */
+.polaroid {                                                    /* polaroid */
+  top: 13%; left: 6%; width: 42%;                              /* position */
+  background: #fff; padding: 3cqw 3cqw 0;                      /* cadre blanc */
+  box-shadow: 0 1.5cqw 3cqw rgba(0, 0, 0, .22);                /* ombre */
+  transform: rotate(-6deg); z-index: 2;                        /* incliné */
+}                                                              /* fin polaroid */
+.polaroid img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--pink-l); } /* photo carrée */
+.polaroid figcaption { font: 5.5cqw/1 var(--f-hand); text-align: center; padding: 2cqw 0 3cqw; } /* légende */
+.pol-tape { top: -2.5cqw; left: 30%; width: 18cqw; height: 5cqw; transform: rotate(-4deg); } /* scotch du polaroid */
+.cd {                                                          /* CD holographique */
+  top: 13.5%; right: 5%; width: 38%; aspect-ratio: 1; border-radius: 50%; /* rond */
+  background:                                                  /* superposition */
+    radial-gradient(circle, transparent 0 8%, #e9e9ef 8.5% 13%, rgba(255, 255, 255, .6) 13.5% 15%, transparent 15.5%), /* trou + anneau central */
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .7), transparent 40%), /* reflet */
+    conic-gradient(#ffd1e8, #c9f0ff, #e6ffd1, #fff3b0, #ffc9e0, #d9c9ff, #c9f0ff, #ffd1e8); /* arc-en-ciel pastel */
+  border: 2px solid #fff;                                      /* bord blanc */
+  box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .2), inset 0 0 0 1px rgba(0, 0, 0, .06); /* ombre */
+  animation: spin 14s linear infinite; z-index: 2;             /* tourne lentement */
+  -webkit-mask: radial-gradient(circle, transparent 0 8%, #000 8.5%); mask: radial-gradient(circle, transparent 0 8%, #000 8.5%); /* vrai trou au centre */
+}                                                              /* fin CD */
+.cd-st { position: absolute; font-size: 6cqw; line-height: 1; } /* autocollants du CD */
+.st1 { top: 18%; left: 22%; color: var(--pink-d); }            /* cœur */
+.st2 { bottom: 20%; right: 18%; color: #fff; text-shadow: 0 0 2px #b9a3ff; } /* étoile scintillante */
+.st3 { top: 26%; right: 20%; color: #ffd36e; font-size: 4.5cqw; } /* étoile jaune */
+.note { font: 5cqw/1.15 var(--f-hand); color: var(--brown); z-index: 3; } /* note manuscrite */
+.n1 { top: 39.5%; right: 4%; width: 44%; transform: rotate(3deg); background: #fff; padding: 2.5cqw 3cqw; box-shadow: 0 1cqw 2cqw rgba(0, 0, 0, .12); } /* note 1 sur papier */
+.note-tape { top: -2cqw; left: 35%; width: 14cqw; height: 4cqw; transform: rotate(6deg); } /* scotch note 1 */
+.n2 { top: 64.5%; left: 24%; transform: rotate(-3deg); color: var(--red); } /* note 2 */
+.n3 { top: 92%; right: 5%; transform: rotate(2deg); }          /* note 3 */
+.player {                                                      /* lecteur style carte */
+  top: 48.5%; left: 7%; right: 7%; height: 14.5%;              /* position */
+  display: flex; align-items: center; gap: 3cqw; padding: 2.5cqw; /* contenu en ligne */
+  background: var(--red); color: #fff; border: 2px solid #7d1a20; border-radius: 4cqw; /* carte rouge */
+  box-shadow: 0 1.5cqw 0 #7d1a20, 0 3cqw 5cqw rgba(0, 0, 0, .2); /* relief */
+  transform: rotate(-1.5deg); z-index: 4;                      /* légèrement penché */
+}                                                              /* fin lecteur */
+.player-cover { width: 18cqw; height: 18cqw; flex: none; object-fit: cover; border-radius: 2cqw; border: 2px solid #fff; background: var(--pink); } /* pochette */
+.player-info { flex: 1; min-width: 0; }                        /* infos */
+.player-title { font: 800 4.6cqw/1.1 var(--f-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* titre */
+.player-artist { font: 3.6cqw/1.2 var(--f-body); opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* artiste */
+.player-bar { height: 1.4cqw; min-height: 4px; background: rgba(255, 255, 255, .3); border-radius: 9px; margin: 1.6cqw 0 1cqw; overflow: hidden; } /* rail */
+.player-bar span { display: block; height: 100%; width: 0; background: var(--cream); border-radius: inherit; } /* progression */
+.player-time { display: flex; align-items: center; justify-content: space-between; font: 2.6cqw var(--f-pixel); } /* temps */
+.eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 3cqw; } /* égaliseur */
+.eq i { width: 3px; height: 30%; background: var(--cream); }   /* barre d'égaliseur */
+.scrap.is-playing .eq i { animation: eq .8s ease-in-out infinite alternate; } /* danse pendant la lecture */
+.eq i:nth-child(2) { animation-delay: -.3s !important; }       /* décalage barre 2 */
+.eq i:nth-child(3) { animation-delay: -.55s !important; }      /* décalage barre 3 */
+.player-play {                                                 /* bouton ▶ */
+  width: 13cqw; height: 13cqw; min-width: 44px; min-height: 44px; flex: none; /* ≥ 44 px */
+  border-radius: 50%; border: 2px solid #7d1a20;               /* rond */
+  background: var(--cream); color: var(--red);                 /* crème / rouge */
+  font-size: 5cqw; cursor: pointer;                            /* symbole */
+  box-shadow: 0 3px 0 #7d1a20;                                 /* relief */
+}                                                              /* fin bouton ▶ */
+.player-play:active { translate: 0 2px; box-shadow: 0 1px 0 #7d1a20; } /* enfoncé */
+.vinyl {                                                       /* vinyle qui dépasse */
+  top: 70%; left: -12%; width: 44%; aspect-ratio: 1; border-radius: 50%; /* rond */
+  background:                                                  /* étiquette + sillons */
+    radial-gradient(circle, #111 0 3%, var(--red) 3.5% 15%, #111 15.5% 17%, transparent 17.5%), /* étiquette rouge */
+    repeating-radial-gradient(circle, #1b1b1b 0 2px, #2c2c2c 2px 3px); /* sillons */
+  box-shadow: 0 2cqw 4cqw rgba(0, 0, 0, .3);                   /* ombre */
+  animation: spin 3s linear infinite; animation-play-state: paused; /* tourne seulement pendant la musique */
+  z-index: 1;                                                  /* derrière la cassette */
+}                                                              /* fin vinyle */
+.vinyl::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(135deg, rgba(255, 255, 255, .18), transparent 45%); } /* reflet */
+.scrap.is-playing .vinyl, .scrap.is-playing .reel { animation-play-state: running; } /* rotation pendant la lecture */
+.cassette {                                                    /* cassette rose */
+  top: 71.5%; right: 5%; width: 46%; aspect-ratio: 1.55;       /* position */
+  background: #f7a9c6; border: 2px solid var(--brown); border-radius: 2.5cqw; /* boîtier */
+  transform: rotate(-6deg); z-index: 3;                        /* penché */
+  box-shadow: 0 1.5cqw 3cqw rgba(0, 0, 0, .2);                 /* ombre */
+}                                                              /* fin cassette */
+.cas-tape { top: -2cqw; right: -3cqw; width: 14cqw; height: 4cqw; transform: rotate(35deg); } /* scotch cassette */
+.cas-label { position: absolute; left: 8%; right: 8%; top: 9%; height: 26%; background: var(--cream); border: 1.5px solid var(--brown); border-radius: 1cqw; display: grid; place-items: center; font: 4.4cqw/1 var(--f-hand); } /* étiquette */
+.cas-window { position: absolute; left: 22%; right: 22%; top: 42%; height: 26%; background: #4a3a36; border: 1.5px solid var(--brown); border-radius: 4cqw; display: flex; justify-content: space-around; align-items: center; } /* fenêtre */
+.reel { width: 5.5cqw; height: 5.5cqw; border-radius: 50%; background: repeating-conic-gradient(var(--cream) 0 30deg, #d9c8b5 30deg 60deg); border: 1.5px solid var(--cream); animation: spin 2s linear infinite; animation-play-state: paused; } /* bobines */
+.cas-bottom { position: absolute; left: 20%; right: 20%; bottom: 0; height: 18%; background: #ef8fb3; border: 1.5px solid var(--brown); border-bottom: 0; clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%); } /* bas trapézoïdal */
+.pix { width: 6cqw; color: var(--red); image-rendering: pixelated; z-index: 5; } /* cœurs pixel */
+.px1 { top: 4%; left: 12%; }                                   /* cœur pixel 1 */
+.px2 { top: 45%; left: 4%; width: 5cqw; color: var(--pink-d); } /* cœur pixel 2 */
+.px3 { top: 87%; left: 42%; width: 4.5cqw; }                   /* cœur pixel 3 */
+.audio-hint { font: .95rem var(--f-hand); opacity: .8; text-align: center; max-width: 340px; } /* info audio */
+
+/* ───── 10. ÉTAPE 5 : MATCHA CLUB (photobooth) ───── */
+.booth {                                                       /* scène photobooth */
+  position: relative;                                          /* repère */
+  width: min(100%, 480px, calc((100svh - 130px) * .643));      /* taille adaptée */
+  aspect-ratio: 9 / 14; container-type: inline-size;           /* proportions + unités cqw */
+}                                                              /* fin scène */
+.sticker {                                                     /* autocollants avec liseré blanc */
+  position: absolute; overflow: visible;                       /* libre */
+  filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 3px 4px rgba(0, 0, 0, .2)); /* bord blanc d'autocollant */
+}                                                              /* fin autocollant */
+.st-logo { top: 0; left: 28%; width: 44%; z-index: 4; animation: wiggle 4s ease-in-out infinite; } /* logo matcha CLUB */
+.st-tulip { top: 4%; left: 1%; width: 22%; transform: rotate(-10deg); z-index: 4; } /* tulipe */
+.st-cocktail { bottom: 3%; right: 2%; width: 22%; transform: rotate(10deg); z-index: 4; } /* cocktail */
+.st-cat { bottom: 2%; left: 2%; width: 24%; transform: rotate(-6deg); z-index: 4; } /* chat noir */
+.strip {                                                       /* bande photobooth */
+  position: absolute; left: 33.5%; width: 33%; top: 24%; z-index: 2; /* centrée */
+  background: var(--brown); padding: 2cqw 2cqw 0; border-radius: 3px; /* cadre marron */
+  box-shadow: 0 2cqw 4cqw rgba(0, 0, 0, .25);                  /* ombre */
+  opacity: 0;                                                  /* cachée au départ (pas de transform : mesures FLIP exactes) */
+  transition: opacity .5s ease;                                /* apparition en fondu */
+}                                                              /* fin bande */
+.booth.is-arranged .strip { opacity: 1; }                      /* bande visible une fois rangée */
+.slot { position: relative; aspect-ratio: 4 / 3; margin-bottom: 2cqw; background: rgba(251, 241, 222, .15); } /* emplacement photo */
+.strip-label { font: 4cqw/1 var(--f-hand); color: var(--cream); text-align: center; padding: .5cqw 0 2cqw; } /* légende */
+.bphoto {                                                      /* photo éparpillée */
+  position: absolute; width: 40%; aspect-ratio: 4 / 3; z-index: 3; /* taille */
+  background: #fff; padding: 1.6cqw;                           /* bord blanc */
+  box-shadow: 0 1.5cqw 3cqw rgba(0, 0, 0, .22);                /* ombre */
+  transform: rotate(var(--r));                                 /* inclinaison */
+  cursor: pointer;                                             /* cliquable */
+}                                                              /* fin photo */
+.bphoto img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; background: var(--pink-l); } /* image remplie (visages vers le haut) */
+.bphoto.in-slot { position: absolute; inset: 0 !important; width: 100%; height: 100%; padding: 0; box-shadow: none; transform: none; cursor: default; } /* photo rangée dans la bande */
+
+/* ───── 11. ÉTAPE 6 : ONE LAST SECRET (carte à gratter) ───── */
+.secret-title { font: 1.9rem/1.15 var(--f-hand); text-align: center; max-width: 340px; } /* titre */
+.secret-sub { font: 1.25rem var(--f-hand); color: var(--red); margin-top: -8px; } /* consigne */
+.scratch-zone { position: relative; width: min(80vw, 360px); aspect-ratio: 1; margin: 6px auto 30px; } /* zone carrée */
+.scratch-photo {                                               /* photo cachée */
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; /* plein */
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;          /* masque cœur étiré (posé par le script) */
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;      /* une seule fois */
+  background: var(--pink-l);                                   /* fond de secours */
+}                                                              /* fin photo */
+.scratch-canvas {                                              /* cœur à gratter */
+  position: absolute; inset: 0; width: 100%; height: 100%;     /* superposé */
+  touch-action: none;                                          /* le doigt gratte au lieu de faire défiler */
+  transition: opacity .9s ease, transform .9s ease, filter .9s ease; /* dissolution */
+  filter: drop-shadow(0 6px 0 rgba(107, 74, 58, .2));          /* relief */
+}                                                              /* fin canvas */
+.scratch-canvas.is-gone { opacity: 0; transform: scale(1.08); filter: blur(8px); pointer-events: none; } /* le reste se dissout */
+.capy { position: absolute; width: 36%; bottom: -10%; z-index: 2; pointer-events: none; } /* capybaras */
+.capy-l { left: -9%; transform: scaleX(-1) rotate(4deg); }     /* capybara gauche (retourné) */
+.capy-r { right: -9%; transform: rotate(4deg); }               /* capybara droit */
+
+/* ───── 12. ÉTAPE 7 : DEAR SUITOR, (lettre) ───── */
+.letter {                                                      /* carte-lettre */
+  position: relative; width: min(100%, 560px);                 /* largeur */
+  background-color: var(--cream);                              /* crème */
+  background-image: repeating-linear-gradient(transparent 0 31px, rgba(169, 192, 143, .35) 31px 32px); /* lignes */
+  background-position: 0 50px;                                 /* lignes alignées au texte */
+  border: 2px solid var(--brown); border-radius: 18px;         /* bord */
+  padding: 58px 24px 30px;                                     /* marges */
+  box-shadow: var(--shadow);                                   /* ombre */
+  min-height: 360px;                                           /* hauteur mini */
+}                                                              /* fin lettre */
+.letter-bow { position: absolute; width: 112px; left: -24px; top: -36px; transform: rotate(-14deg); } /* ruban vert */
+.letter-heart { position: absolute; color: var(--pink); animation: pulse 1.6s ease-in-out infinite; } /* cœurs roses */
+.lh1 { width: 26px; top: 16px; right: 22px; }                  /* cœur 1 */
+.lh2 { width: 16px; top: 38px; right: 50px; animation-delay: -.6s; } /* cœur 2 */
+.letter-text { font: 1.3rem/32px var(--f-hand); }              /* texte manuscrit */
+.letter-text p { margin: 0 0 32px; }                           /* espace entre paragraphes */
+.letter-text .l-greet { font: 2.3rem/32px var(--f-script); color: var(--red); } /* « Dear Suitor, » */
+.letter-text .l-sig { margin: 0; text-align: right; }          /* formule finale */
+.letter-text .l-name { text-align: right; font: 2rem/40px var(--f-script); color: var(--red); } /* signature */
+.caret { display: inline-block; width: 2px; height: 1.1em; background: var(--brown); margin-left: 2px; vertical-align: -3px; animation: blink .8s steps(1) infinite; } /* curseur machine à écrire */
+
+/* ───── 12 bis. ÉTAPE 0 : ACCUEIL (prénom + personnalisation) ───── */
+.win-setup { width: min(100%, 420px); margin-top: 40px; }      /* fenêtre d'accueil */
+.setup-body { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 0; } /* colonne */
+.setup-kitten { width: 84px; margin-top: 14px; }               /* chaton au cœur sous la barre de titre */
+.setup-block { width: 100%; border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; } /* bloc question */
+.setup-label { font: 1.3rem/1.2 var(--f-hand); padding: 0; text-align: center; } /* question manuscrite */
+.setup-input {                                                 /* champ prénom */
+  width: 100%; min-height: 52px; padding: 10px 16px;           /* zone tactile */
+  font: 16px/1.2 var(--f-body); font-weight: 700; text-align: center; color: var(--brown); /* 16 px = pas de zoom iOS */
+  background: #fff; border: 2px solid var(--brown); border-radius: 999px; /* pilule blanche */
+  box-shadow: inset 0 3px 0 rgba(107, 74, 58, .08);            /* creux */
+}                                                              /* fin champ */
+.setup-input:focus { outline: none; border-color: var(--pink-d); box-shadow: 0 0 0 4px var(--pink-l); } /* focus rose */
+.setup-input.is-error { animation: shakeX .5s; border-color: var(--red); } /* prénom manquant */
+.btn-choice { background: #fff; font-size: 1.1rem; padding: 10px 16px; } /* bouton de choix */
+.btn-choice[aria-pressed="true"] { background: #b9d99b; }      /* choix sélectionné en vert */
+.own-panel { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; } /* panneau des fichiers */
+.own-note { font: 1rem/1.3 var(--f-hand); opacity: .8; text-align: center; } /* explication */
+.pick-grid { width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; } /* grille de vignettes */
+.pick {                                                        /* vignette cliquable */
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; /* image + libellé */
+  background: #fff; border: 2px solid var(--brown); border-radius: 12px; padding: 6px; /* carte blanche */
+  font: .95rem/1 var(--f-hand); cursor: pointer;               /* libellé manuscrit */
+  box-shadow: 0 3px 0 rgba(107, 74, 58, .25);                  /* relief */
+}                                                              /* fin vignette */
+.pick img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; background: var(--pink-l); } /* aperçu carré */
+.pick input { position: absolute; width: 1px; height: 1px; opacity: 0; } /* champ fichier invisible mais accessible au clavier */
+.pick:focus-within { outline: 3px dashed var(--red); outline-offset: 3px; } /* focus clavier visible */
+.pick.is-custom { border-color: var(--pink-d); background: var(--pink-l); } /* fichier remplacé */
+.pick.is-custom::after { content: '♡'; position: absolute; top: -8px; right: -6px; width: 24px; height: 24px; display: grid; place-items: center; background: var(--pink-d); color: #fff; border-radius: 50%; font: 14px/1 var(--f-body); } /* badge cœur */
+.pick-audio { width: 100%; flex-direction: row; gap: 12px; min-height: 56px; padding: 8px 14px; } /* choix de chanson */
+.pick-ico { width: 40px; height: 40px; flex: none; display: grid; place-items: center; background: var(--red); color: #fff; border-radius: 50%; font-size: 1.3rem; } /* note de musique */
+.pick-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; text-align: left; } /* textes */
+.pick-text b { font-weight: 400; font-size: 1.15rem; }         /* « Your song » */
+.pick-text small { font: .8rem var(--f-body); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; } /* nom du fichier */
+.for-name { font: 1.5rem var(--f-hand); color: var(--brown); margin: -14px 0 14px; } /* « for <prénom> ♡ » */
+
+/* ───── 13. ANIMATIONS ───── */
+@keyframes bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } } /* flottement */
+@keyframes pulse { 0%, 100% { scale: 1; } 50% { scale: 1.12; } } /* battement */
+@keyframes spin { to { rotate: 360deg; } }                     /* rotation */
+@keyframes shake { 0%, 100% { rotate: 0deg; } 25% { rotate: -5deg; translate: -3px 0; } 75% { rotate: 5deg; translate: 3px 0; } } /* tremblement boîte */
+@keyframes shakeX { 10%, 90% { translate: -2px 0; } 20%, 80% { translate: 4px 0; } 30%, 50%, 70% { translate: -8px 0; } 40%, 60% { translate: 8px 0; } } /* tremblement fenêtre */
+@keyframes wiggle { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } } /* balancement */
+@keyframes eq { from { height: 25%; } to { height: 100%; } }   /* égaliseur */
+@keyframes blink { 50% { opacity: 0; } }                       /* clignotement */
+
+/* ───── 14. DESKTOP ───── */
+@media (min-width: 768px) {                                    /* écrans larges */
+  .kitten-hide { width: 130px; }                               /* chaton plus grand */
+  .ask-wrap { width: 440px; }                                  /* fenêtre plus large */
+  .deco-bear { width: 130px; left: -60px; top: -100px; }       /* ourson qui déborde */
+  .deco-kitten { width: 120px; right: -60px; bottom: -80px; }  /* chaton qui déborde */
+  .win-date { width: 420px; }                                  /* fenêtre date */
+  .letter { padding: 64px 48px 40px; }                         /* lettre aérée */
+  .letter-text { font-size: 1.4rem; }                          /* texte plus grand */
+}                                                              /* fin desktop */
+
+/* ───── 15. MOUVEMENT RÉDUIT ───── */
+@media (prefers-reduced-motion: reduce) {                      /* préférence système « réduire les animations » */
+  *, *::before, *::after {                                     /* tout */
+    animation-duration: .001ms !important;                     /* animations quasi instantanées */
+    animation-iteration-count: 1 !important;                   /* une seule fois */
+    transition-duration: .001ms !important;                    /* transitions instantanées */
+  }                                                            /* fin tout */
+  .cloud { display: none; }                                    /* pas de nuages qui bougent */
+}                                                              /* fin mouvement réduit */
