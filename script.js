@@ -190,7 +190,7 @@
     vibrate(30);                                                          // petite vibration
     const r = gift.getBoundingClientRect();                               // position de la boîte
     burst(r.left + r.width / 2, r.top + r.height * .35, 26, { up: true, spread: 260 }); // les cœurs s'envolent
-    say('The box is open!');                                              // annonce
+    say('La boîte est ouverte !');                                              // annonce
     await wait(reduced() ? 300 : 1350);                                   // on profite du spectacle
     goTo(2);                                                              // étape 2
   });                                                                     // fin clic boîte
@@ -207,22 +207,23 @@
     w.className = 'win win-err';                                          // style fenêtre d'erreur
     w.style.setProperty('--i', i);                                        // rang dans la pile
     w.style.setProperty('--dx', DX[(i - 1) % DX.length] + 'px');          // décalage latéral
-    w.innerHTML = '<div class="titlebar"><span class="tb-title">System error</span><span class="tb-btns"><i>✕</i></span></div>' + // barre de titre
+    w.innerHTML = '<div class="titlebar"><span class="tb-title"></span><span class="tb-btns"><i>✕</i></span></div>' + // barre de titre
       '<div class="err-body"><span class="err-icon"><svg viewBox="0 0 5 9"><use href="#m-excl"/></svg></span><p></p>' + // icône + texte
       '<button type="button" class="btn btn-ok" tabindex="-1">OK</button></div>'; // bouton OK
-    $('p', w).textContent = T.erreurSysteme || 'Error ♡';                 // message (depuis config.js)
+    $('.tb-title', w).textContent = T.titreErreur || 'Erreur système';  // titre (depuis config.js)
+    $('p', w).textContent = T.erreurSysteme || 'Erreur ♡';                 // message (depuis config.js)
     $('.btn-ok', w).addEventListener('click', () => w.remove());          // OK ferme la fenêtre
     errStack.appendChild(w);                                              // empile derrière la fenêtre principale
     fx(w, { opacity: 0, scale: .7 }, { opacity: 1, scale: 1 }, { duration: .35, ease: 'back.out(1.7)' }); // apparition
-    say('System error');                                                  // annonce
+    say(T.titreErreur || 'Erreur système');                                                  // annonce
   }                                                                       // fin addError
   function convert() {                                                    // 5e essai : « No » devient « Yes »
     converted = true;                                                     // plus de fuite
-    noBtn.textContent = T.oui || 'Yes, plz!';                             // nouveau texte
+    noBtn.textContent = T.oui || 'Oui, stp !';                             // nouveau texte
     noBtn.classList.replace('btn-no', 'btn-yes');                         // devient vert
     const r = noBtn.getBoundingClientRect();                              // position
     burst(r.left + r.width / 2, r.top + r.height / 2, 12);                // petits cœurs
-    say('No became Yes!');                                                // annonce
+    say('Non est devenu Oui !');                                                // annonce
   }                                                                       // fin convert
   function dodge(px, py) {                                                // le bouton s'échappe du point (px, py)
     if (converted) return;                                                // plus de fuite après conversion
@@ -257,13 +258,13 @@
   });                                                                     // fin clic non
 
   /* ───── 7. ÉTAPE 3 : DATE SECRÈTE + PAVÉ NUMÉRIQUE ───── */
-  const ORDER = ['mm', 'dd', 'yyyy'];                                     // ordre de saisie
+  const ORDER = ['dd', 'mm', 'yyyy'];                                     // ordre de saisie (format français JJ / MM / AAAA)
   const MAX = { mm: 2, dd: 2, yyyy: 4 };                                  // longueur de chaque champ
   const dateState = { mm: '', dd: '', yyyy: '' };                         // valeurs saisies
   const fieldEls = { mm: $('#fMM'), dd: $('#fDD'), yyyy: $('#fYYYY') };   // éléments des champs
   const dateWin = $('#dateWin');                                          // fenêtre
   const dateMsg = $('#dateMsg');                                          // message
-  let activeF = 'mm';                                                     // champ actif
+  let activeF = ORDER[0];                                                     // champ actif
   let unlocked = false;                                                   // date trouvée ?
   function renderDate() {                                                 // met à jour l'affichage
     ORDER.forEach(k => {                                                  // pour chaque champ
@@ -279,7 +280,7 @@
     if (unlocked) return;                                                 // plus rien après réussite
     if (k === 'C') {                                                      // C = tout effacer
       ORDER.forEach(f => { dateState[f] = ''; });                         // vide
-      activeF = 'mm';                                                     // retour au mois
+      activeF = ORDER[0];                                                   // retour au jour
     } else if (k === 'back') {                                            // ⌫ = effacer un chiffre
       if (!dateState[activeF]) { const i = ORDER.indexOf(activeF); if (i > 0) activeF = ORDER[i - 1]; } // champ vide → champ précédent
       dateState[activeF] = dateState[activeF].slice(0, -1);               // retire le dernier chiffre
@@ -296,21 +297,27 @@
   }                                                                       // fin press
   async function checkDate() {                                            // vérifie la date
     if (unlocked) return;                                                 // déjà trouvée
-    const parts = String(C.dateSecrete || '').split(/[^0-9]+/).filter(Boolean).map(Number); // "10-17" → [10, 17]
-    const [m, d, y] = parts;                                              // mois, jour, année (facultative)
-    const ok = dateState.mm !== '' && dateState.dd !== ''                 // mois et jour remplis
-      && Number(dateState.mm) === m && Number(dateState.dd) === d         // bons mois et jour
-      && (!y || Number(dateState.yyyy) === y);                            // bonne année si exigée
-    if (!ok) {                                                            // mauvaise date
+    const dd = Number(dateState.dd), mm = Number(dateState.mm), yy = dateState.yyyy; // valeurs saisies
+    const year = yy.length === 4 ? Number(yy) : 2000;                     // année (2000 = bissextile, pour accepter le 29/02 sans année)
+    const real = dateState.dd !== '' && dateState.mm !== ''               // jour et mois remplis
+      && mm >= 1 && mm <= 12                                              // mois de 1 à 12
+      && dd >= 1 && dd <= new Date(year, mm, 0).getDate()                 // jour qui existe dans ce mois (pas de 31/02)
+      && (yy === '' || (yy.length === 4 && year >= 1900 && year <= new Date().getFullYear())); // année facultative mais plausible
+    let ok = real;                                                        // par défaut : toute date valide passe (ex. date d'anniversaire)
+    if (C.toutesLesDates === false) {                                     // mode « une seule date secrète »
+      const [d, m, y] = String(C.dateSecrete || '').split(/[^0-9]+/).filter(Boolean).map(Number); // "17-10" → jour 17, mois 10
+      ok = real && dd === d && mm === m && (!y || year === y);            // bonne date (et bonne année si exigée)
+    }                                                                     // fin mode date secrète
+    if (!ok) {                                                            // date refusée
       dateWin.classList.remove('shake');                                  // relance l'animation…
       void dateWin.offsetWidth;                                           // …(force le recalcul)
       dateWin.classList.add('shake');                                     // la fenêtre tremble
-      dateMsg.textContent = T.erreurDate || 'Not quite… try again ♡';     // message mignon
+      dateMsg.textContent = real ? (T.erreurDate || 'Presque… réessaie ♡') : (T.dateInvalide || 'Cette date n’existe pas… réessaie ♡'); // message mignon
       vibrate([40, 40, 40]);                                              // petite vibration
       return;                                                             // on s'arrête là
     }                                                                     // fin mauvaise date
     unlocked = true;                                                      // réussite
-    dateMsg.textContent = T.bonneDate || 'Yes! ♡';                        // message
+    dateMsg.textContent = T.bonneDate || 'Oui ! ♡';                        // message
     dateMsg.classList.add('ok');                                          // style vert
     const r = dateWin.getBoundingClientRect();                            // position fenêtre
     burst(r.left + r.width / 2, r.top + r.height / 2, 40, { spread: 320 }); // confettis de cœurs
@@ -409,7 +416,7 @@
   function setPlaying(p) {                                                // met à jour l'état lecture
     playing = p;                                                          // mémorise
     playBtn.setAttribute('aria-pressed', String(p));                      // accessibilité
-    playBtn.setAttribute('aria-label', p ? 'Pause the song' : 'Play the song'); // libellé
+    playBtn.setAttribute('aria-label', p ? 'Mettre la chanson en pause' : 'Lancer la chanson'); // libellé
     $('.ico', playBtn).textContent = p ? '❚❚' : '▶';                      // icône
     scrap.classList.toggle('is-playing', p);                              // vinyle + bobines tournent
     if (p) requestAnimationFrame(tick);                                   // lance la barre de progression
@@ -436,7 +443,7 @@
     }                                                                     // fin pause
     if (useSynth) { startSynth(); return; }                               // boîte à musique
     try { await audio.play(); setPlaying(true); }                         // joue le fichier
-    catch (err) { startSynth('Audio file not found — playing a little music box instead ♡'); } // fichier absent → repli
+    catch (err) { startSynth('Fichier audio introuvable : petite boîte à musique à la place ♡'); } // fichier absent → repli
   });                                                                     // fin clic lecture
 
   /* ───── 9. ÉTAPE 5 : PHOTOBOOTH ───── */
@@ -465,7 +472,7 @@
       const nb = $('#boothNext');                                         // bouton continuer
       nb.hidden = false;                                                  // l'affiche
       fx(nb, { opacity: 0, y: 14 }, { opacity: 1, y: 0 }, { duration: .4 }); // apparition
-      say('Photobooth strip ready');                                      // annonce
+      say('La bande photomaton est prête');                                      // annonce
     }, reduced() ? 50 : 1700);                                            // délai
   }                                                                       // fin arrange
   booth.addEventListener('click', arrange);                               // clic n'importe où → rangement
@@ -504,7 +511,7 @@
     cx.fillStyle = '#fff';                                                // texte blanc
     cx.font = '9px "Patrick Hand", cursive';                              // police manuscrite
     cx.textAlign = 'center'; cx.textBaseline = 'middle';                  // centré
-    cx.fillText('scratch me ♡', 50, 46);                                  // invitation
+    cx.fillText(T.gratteMoi || 'gratte-moi ♡', 50, 46);                                  // invitation
     cx.restore();                                                         // restaure
     cx.save(); cx.scale(s, s);                                            // contour
     cx.lineWidth = 1.6; cx.strokeStyle = 'rgba(107,74,58,.55)'; cx.stroke(p); // liseré marron
@@ -556,7 +563,7 @@
     const nb = $('#scratchNext');                                         // bouton continuer
     nb.hidden = false;                                                    // l'affiche
     fx(nb, { opacity: 0, y: 14 }, { opacity: 1, y: 0 }, { duration: .4, delay: .4 }); // apparition
-    say('Secret revealed!');                                              // annonce
+    say('Secret révélé !');                                              // annonce
   }                                                                       // fin reveal
   const posIn = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }; // coordonnées locales
   cv.addEventListener('pointerdown', e => {                               // début du grattage
@@ -584,9 +591,9 @@
   async function typeLetter() {                                           // écrit la lettre lettre par lettre
     if (typed) return;                                                    // une seule fois
     typed = true; typing = true; skipTyping = reduced();                  // état (mouvement réduit = tout de suite)
-    const blocks = [{ t: `Dear ${visitorName || C.destinataire || 'Suitor'},`, cls: 'l-greet' }] // « Dear <prénom>, »
+    const blocks = [{ t: (T.debutLettre || '{nom}, mon cœur,').replace('{nom}', visitorName || C.destinataire || 'mon cœur'), cls: 'l-greet' }] // « <prénom>, mon cœur, »
       .concat((C.lettre || []).map(t => ({ t: String(t), cls: '' })))     // paragraphes
-      .concat([{ t: T.signature || 'Forever yours,', cls: 'l-sig' }, { t: C.expediteur || '', cls: 'l-name' }]); // signature
+      .concat([{ t: T.signature || 'Pour toujours à toi,', cls: 'l-sig' }, { t: C.expediteur || '', cls: 'l-name' }]); // signature
     $('#letterSr').textContent = blocks.map(b => b.t).join(' ');          // texte complet pour lecteurs d'écran
     const caret = document.createElement('span');                         // curseur clignotant
     caret.className = 'caret';                                            // style
@@ -658,7 +665,7 @@
   const songFileName = $('#songFileName');                                // nom du fichier chanson
   const custom = {};                                                      // fichiers choisis : clé → { key, blob, name, url }
   let useOwn = false;                                                     // la personne a choisi « oui » ?
-  nameInput.placeholder = T.placeholderNom || 'your name ♡';              // texte gris du champ
+  nameInput.placeholder = T.placeholderNom || 'ton prénom ♡';              // texte gris du champ
   $('#nameBlock').hidden = !askName;                                      // masque la question si désactivée
   $('#ownBlock').hidden = !askOwn;                                        // idem pour la personnalisation
 
@@ -674,7 +681,7 @@
     if (useOwn) Object.values(custom).forEach(c => setMediaKey(c.key, c.url)); // applique les fichiers perso
     $$('.pick').forEach(p => p.classList.toggle('is-custom', !!custom[p.dataset.key])); // badge ♡ sur les vignettes changées
     const song = custom.audio;                                            // chanson perso ?
-    songFileName.textContent = song ? song.name : (DEFAULT_MEDIA.audio ? 'original song' : 'music box'); // nom affiché
+    songFileName.textContent = song ? song.name : (DEFAULT_MEDIA.audio ? 'chanson d’origine' : 'boîte à musique'); // nom affiché
     applyMedia();                                                         // photos partout
     $$('#ownPanel img[data-photo]').forEach(img => {                      // les vignettes montrent toujours le choix en cours
       const k = img.closest('.pick').dataset.key;                         // clé de la vignette
@@ -682,7 +689,7 @@
       if (src) img.src = src; else img.removeAttribute('src');            // affiche
     });                                                                   // fin vignettes
     setSong(media.audio);                                                 // chanson active
-    $('.player-title').textContent = useOwn && song ? song.name.replace(/\.[^.]+$/, '') : (C.titreChanson || 'Our Song'); // titre affiché
+    $('.player-title').textContent = useOwn && song ? song.name.replace(/\.[^.]+$/, '') : (C.titreChanson || 'Notre chanson'); // titre affiché
   }                                                                       // fin refreshPicks
   function chooseOwn(yes) {                                               // clic sur oui / non
     useOwn = yes;                                                         // mémorise
@@ -702,19 +709,19 @@
     custom[key] = { key, blob: file, name: file.name, url: URL.createObjectURL(file) }; // nouveau fichier (local)
     input.value = '';                                                     // permet de rechoisir le même fichier
     refreshPicks();                                                       // applique
-    say(`${file.name} selected`);                                         // annonce
+    say(`${file.name} choisi`);                                         // annonce
   }));                                                                    // fin choix de fichier
   $('#ownReset').addEventListener('click', () => {                        // revenir aux originaux
     Object.keys(custom).forEach(k => { URL.revokeObjectURL(custom[k].url); delete custom[k]; }); // oublie les fichiers perso
     DB.clear();                                                           // efface la mémoire du téléphone
     refreshPicks();                                                       // applique
-    say('Back to the original photos and song');                          // annonce
+    say('Retour aux photos et à la chanson d’origine');                          // annonce
   });                                                                     // fin reset
   setupForm.addEventListener('submit', async e => {                       // « Discover my surprise ♡ »
     e.preventDefault();                                                   // pas de rechargement de page
     const name = nameInput.value.trim().replace(/\s+/g, ' ');             // prénom nettoyé
     if (askName && !name) {                                               // prénom obligatoire
-      setupMsg.textContent = T.erreurNom || 'Tell me your name first ♡';  // message
+      setupMsg.textContent = T.erreurNom || 'Dis-moi d’abord ton prénom ♡';  // message
       nameInput.classList.remove('is-error'); void nameInput.offsetWidth; nameInput.classList.add('is-error'); // tremblement
       nameInput.focus();                                                  // focus sur le champ
       return;                                                             // stop
@@ -730,7 +737,7 @@
   function applyName(name) {                                              // affiche le prénom dans le site
     visitorName = name;                                                   // pour « Dear <prénom>, »
     const fn = $('#forName');                                             // ligne sous le titre
-    fn.textContent = (T.pourToi || 'for {nom} ♡').replace('{nom}', name); // « for <prénom> ♡ »
+    fn.textContent = (T.pourToi || 'pour {nom} ♡').replace('{nom}', name); // « for <prénom> ♡ »
     fn.hidden = !name;                                                    // cachée si pas de prénom
   }                                                                       // fin applyName
   async function startJourney() {                                         // appelé quand le CSS s'allume

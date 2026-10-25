@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="is-raw"><!-- langue du contenu ; classe « is-raw » = phase HTML brut -->
+<html lang="fr" class="is-raw"><!-- langue du contenu ; classe « is-raw » = phase HTML brut -->
 <head>
   <meta charset="utf-8"><!-- encodage des caractères (accents, cœurs ♡) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><!-- rendu mobile correct, sans bloquer le zoom -->
   <meta name="robots" content="noindex, nofollow"><!-- demande aux moteurs de recherche de NE PAS indexer ce site privé -->
   <meta name="theme-color" content="#f9a8c4"><!-- couleur de la barre du navigateur mobile -->
-  <title>You've Got Mail ♡</title><!-- titre de l'onglet -->
+  <title>Tu as du courrier ♡</title><!-- titre de l'onglet -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 88C20 68 4 50 4 31C4 17 15 7 28 7C38 7 46 13 50 22C54 13 62 7 72 7C85 7 96 17 96 31C96 50 80 68 50 88Z' fill='%23f9a8c4'/%3E%3C/svg%3E"><!-- favicon cœur rose -->
   <link rel="preconnect" href="https://fonts.googleapis.com"><!-- connexion anticipée aux polices Google -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><!-- connexion anticipée aux fichiers de polices -->
@@ -32,8 +32,8 @@
 
   <!-- ═══════════ EFFET SIGNATURE : HTML BRUT (texte noir sur blanc) ═══════════ -->
   <div id="raw" class="raw-intro"><!-- bloc visible seulement avant que le CSS s'allume -->
-    <p data-t="question">Are you interested to know?</p><!-- la question en HTML brut -->
-    <p><a href="#" data-raw data-t="oui">Yes, plz!</a> <a href="#" data-raw data-t="non">No, tnx!</a></p><!-- deux liens bleus soulignés par défaut -->
+    <p data-t="question">Tu veux savoir ce que c’est ?</p><!-- la question en HTML brut -->
+    <p><a href="#" data-raw data-t="oui">Oui, stp !</a> <a href="#" data-raw data-t="non">Non merci !</a></p><!-- deux liens bleus soulignés par défaut -->
   </div><!-- fin du bloc brut -->
 
   <!-- ═══════════ SPRITES SVG : mascottes ORIGINALES et autocollants ═══════════ -->
@@ -154,7 +154,7 @@
         <path d="M34 34q-2 36 26 42 28-6 26-42l-13 15-13-23-13 23z" fill="#e8435e" stroke="#6b4a3a" stroke-width="3" stroke-linejoin="round"/><!-- fleur -->
         <path d="M45 50q2 14 10 18" fill="none" stroke="#ff9aae" stroke-width="3" stroke-linecap="round"/><!-- reflet -->
         <rect x="10" y="140" width="100" height="26" rx="13" fill="#fbf1de" stroke="#6b4a3a" stroke-width="2.5"/><!-- étiquette -->
-        <text x="60" y="158" text-anchor="middle" font-family="'Press Start 2P', monospace" font-size="9" fill="#b3262e">TULIP ♥</text><!-- texte TULIP ♥ -->
+        <text x="60" y="158" text-anchor="middle" font-family="'Press Start 2P', monospace" font-size="9" fill="#b3262e">TULIPE ♥</text><!-- texte TULIP ♥ -->
       </symbol><!-- fin tulipe -->
 
       <symbol id="m-cocktail" viewBox="0 0 120 160"><!-- autocollant cocktail vert -->
@@ -227,34 +227,34 @@
         <div class="titlebar"><span class="tb-title">♡ welcome.exe</span><span class="tb-btns" aria-hidden="true"><i>▁</i><i>☐</i><i>✕</i></span></div><!-- barre de titre -->
         <form id="setupForm" class="win-body setup-body" novalidate><!-- formulaire -->
           <svg class="mascot setup-kitten" viewBox="0 0 140 150" aria-hidden="true"><use href="#m-kitten-heart"/></svg><!-- chaton au cœur -->
-          <h1 id="t0" class="date-title" tabindex="-1" data-focus data-t="bienvenue">Hi there ♡</h1><!-- titre -->
+          <h1 id="t0" class="date-title" tabindex="-1" data-focus data-t="bienvenue">Coucou ♡</h1><!-- titre -->
           <div id="nameBlock" class="setup-block"><!-- bloc prénom -->
-            <label for="nameInput" class="setup-label" data-t="questionNom">What's your name?</label><!-- question -->
+            <label for="nameInput" class="setup-label" data-t="questionNom">Comment tu t’appelles ?</label><!-- question -->
             <input id="nameInput" class="setup-input" type="text" maxlength="30" autocomplete="given-name" autocapitalize="words" enterkeyhint="done"><!-- champ prénom (16 px = pas de zoom) -->
           </div><!-- fin bloc prénom -->
           <fieldset id="ownBlock" class="setup-block own-choice"><!-- bloc personnalisation -->
-            <legend class="setup-label" data-t="questionPerso">Do you want to use your own photos &amp; song?</legend><!-- question -->
+            <legend class="setup-label" data-t="questionPerso">Tu veux mettre tes propres photos et ta chanson ?</legend><!-- question -->
             <div class="btn-row"><!-- choix -->
-              <button type="button" id="ownYes" class="btn btn-choice" aria-pressed="false" data-t="ouiPerso">Yes, my own ♡</button><!-- oui -->
-              <button type="button" id="ownNo" class="btn btn-choice" aria-pressed="true" data-t="nonPerso">No, surprise me</button><!-- non -->
+              <button type="button" id="ownYes" class="btn btn-choice" aria-pressed="false" data-t="ouiPerso">Oui, les miennes ♡</button><!-- oui -->
+              <button type="button" id="ownNo" class="btn btn-choice" aria-pressed="true" data-t="nonPerso">Non, surprends-moi</button><!-- non -->
             </div><!-- fin choix -->
           </fieldset><!-- fin bloc personnalisation -->
           <div id="ownPanel" class="own-panel" hidden><!-- sélection des fichiers -->
-            <p class="own-note" data-t="notePerso">Tap a picture to replace it.</p><!-- explication -->
+            <p class="own-note" data-t="notePerso">Touche une image pour la remplacer.</p><!-- explication -->
             <div class="pick-grid"><!-- vignettes cliquables -->
               <label class="pick" data-key="couple"><input type="file" accept="image/*"><img data-photo="couple" alt=""><span>Polaroid</span></label><!-- photo polaroid -->
-              <label class="pick" data-key="pochette"><input type="file" accept="image/*"><img data-photo="pochette" alt=""><span>Song cover</span></label><!-- pochette -->
+              <label class="pick" data-key="pochette"><input type="file" accept="image/*"><img data-photo="pochette" alt=""><span>Pochette</span></label><!-- pochette -->
               <label class="pick" data-key="gratter"><input type="file" accept="image/*"><img data-photo="gratter" alt=""><span>Secret</span></label><!-- photo secrète -->
-              <label class="pick" data-key="booth0"><input type="file" accept="image/*"><img data-photo="booth.0" alt=""><span>Booth 1</span></label><!-- photobooth 1 -->
-              <label class="pick" data-key="booth1"><input type="file" accept="image/*"><img data-photo="booth.1" alt=""><span>Booth 2</span></label><!-- photobooth 2 -->
-              <label class="pick" data-key="booth2"><input type="file" accept="image/*"><img data-photo="booth.2" alt=""><span>Booth 3</span></label><!-- photobooth 3 -->
-              <label class="pick" data-key="booth3"><input type="file" accept="image/*"><img data-photo="booth.3" alt=""><span>Booth 4</span></label><!-- photobooth 4 -->
+              <label class="pick" data-key="booth0"><input type="file" accept="image/*"><img data-photo="booth.0" alt=""><span>Photo 1</span></label><!-- photobooth 1 -->
+              <label class="pick" data-key="booth1"><input type="file" accept="image/*"><img data-photo="booth.1" alt=""><span>Photo 2</span></label><!-- photobooth 2 -->
+              <label class="pick" data-key="booth2"><input type="file" accept="image/*"><img data-photo="booth.2" alt=""><span>Photo 3</span></label><!-- photobooth 3 -->
+              <label class="pick" data-key="booth3"><input type="file" accept="image/*"><img data-photo="booth.3" alt=""><span>Photo 4</span></label><!-- photobooth 4 -->
             </div><!-- fin vignettes -->
-            <label class="pick pick-audio" data-key="audio"><input type="file" accept="audio/*,video/mp4,.mp3,.m4a,.mp4,.aac,.wav,.ogg"><span class="pick-ico" aria-hidden="true">♪</span><span class="pick-text"><b data-t="chansonPerso">Your song</b><small id="songFileName"></small></span></label><!-- chanson -->
-            <button type="button" id="ownReset" class="link-btn" data-t="resetPerso">Reset to the original ones</button><!-- revenir aux originaux -->
+            <label class="pick pick-audio" data-key="audio"><input type="file" accept="audio/*,video/mp4,.mp3,.m4a,.mp4,.aac,.wav,.ogg"><span class="pick-ico" aria-hidden="true">♪</span><span class="pick-text"><b data-t="chansonPerso">Ta chanson</b><small id="songFileName"></small></span></label><!-- chanson -->
+            <button type="button" id="ownReset" class="link-btn" data-t="resetPerso">Revenir aux originaux</button><!-- revenir aux originaux -->
           </div><!-- fin sélection -->
           <p id="setupMsg" class="date-msg" aria-live="polite"></p><!-- message -->
-          <button type="submit" class="btn btn-main" data-t="boutonDecouvrir">Discover my surprise ♡</button><!-- entrer dans le site -->
+          <button type="submit" class="btn btn-main" data-t="boutonDecouvrir">Découvrir ma surprise ♡</button><!-- entrer dans le site -->
         </form><!-- fin formulaire -->
       </div><!-- fin fenêtre -->
     </section><!-- fin étape 0 -->
@@ -263,9 +263,9 @@
     <section class="step step-1" data-step="1" aria-labelledby="t1" hidden><!-- écran 1 -->
       <div class="s1-inner"><!-- colonne centrée -->
         <svg class="mascot kitten-hide" viewBox="0 0 140 112" aria-hidden="true"><use href="#m-kitten-hide"/></svg><!-- chaton qui se cache les yeux -->
-        <h1 id="t1" class="script-title" tabindex="-1" data-focus data-t="titreMail">You've Got Mail</h1><!-- titre script -->
+        <h1 id="t1" class="script-title" tabindex="-1" data-focus data-t="titreMail">Tu as du courrier</h1><!-- titre script -->
         <p id="forName" class="for-name" hidden></p><!-- « for <prénom> ♡ » -->
-        <button id="gift" class="gift" type="button" aria-label="Open the gift box"><!-- la boîte cliquable -->
+        <button id="gift" class="gift" type="button" aria-label="Ouvrir la boîte cadeau"><!-- la boîte cliquable -->
           <span class="gift-glow" aria-hidden="true"></span><!-- halo rose à l'ouverture -->
           <span class="gift-base" aria-hidden="true"><!-- corps de la boîte -->
             <span class="gift-ribbon"></span><!-- ruban vertical sombre -->
@@ -277,7 +277,7 @@
             <span class="gift-bow"></span><!-- nœud -->
           </span><!-- fin du couvercle -->
         </button><!-- fin de la boîte -->
-        <p class="hint" data-t="indiceBoite">tap the box ♡</p><!-- consigne -->
+        <p class="hint" data-t="indiceBoite">touche la boîte ♡</p><!-- consigne -->
       </div><!-- fin colonne -->
       <svg class="float-heart fh1" viewBox="0 0 100 100" aria-hidden="true"><use href="#m-heart"/></svg><!-- cœur décoratif 1 -->
       <svg class="float-heart fh2" viewBox="0 0 100 100" aria-hidden="true"><use href="#m-heart"/></svg><!-- cœur décoratif 2 -->
@@ -292,10 +292,10 @@
           <div class="titlebar"><span class="tb-title">♡ message.exe</span><span class="tb-btns" aria-hidden="true"><i>▁</i><i>☐</i><i>✕</i></span></div><!-- barre de titre verte -->
           <div class="win-body ask-body"><!-- contenu -->
             <div class="alert-icon" aria-hidden="true"><svg viewBox="0 0 5 9"><use href="#m-excl"/></svg></div><!-- bulle verte « ! » pixel -->
-            <h1 id="t2" class="ask-text" tabindex="-1" data-focus data-t="question">Are you interested to know?</h1><!-- la question -->
+            <h1 id="t2" class="ask-text" tabindex="-1" data-focus data-t="question">Tu veux savoir ce que c’est ?</h1><!-- la question -->
             <div class="btn-row"><!-- rangée des boutons -->
-              <button id="yesBtn" class="btn btn-yes" type="button" data-t="oui">Yes, plz!</button><!-- bouton oui -->
-              <button id="noBtn" class="btn btn-no" type="button" data-t="non">No, tnx!</button><!-- bouton non (fuyard) -->
+              <button id="yesBtn" class="btn btn-yes" type="button" data-t="oui">Oui, stp !</button><!-- bouton oui -->
+              <button id="noBtn" class="btn btn-no" type="button" data-t="non">Non merci !</button><!-- bouton non (fuyard) -->
             </div><!-- fin rangée -->
           </div><!-- fin contenu -->
         </div><!-- fin fenêtre principale -->
@@ -313,24 +313,24 @@
       <div id="dateWin" class="win win-date"><!-- fenêtre calendrier -->
         <div class="titlebar"><span class="tb-title">♡ calendar.exe</span><span class="tb-btns" aria-hidden="true"><i>▁</i><i>☐</i><i>✕</i></span></div><!-- barre de titre -->
         <div class="win-body date-body"><!-- contenu -->
-          <h1 id="t3" class="date-title" tabindex="-1" data-focus data-t="titreDate">When do I choose you?</h1><!-- titre -->
-          <p class="date-sub" data-t="sousTitreDate">Every day. Start with today.</p><!-- sous-titre -->
-          <div class="bubble"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#m-heart"/></svg><span data-t="bulleDate">psst… it's our special day ♡</span></div><!-- bulle de dialogue avec cœur -->
-          <div class="date-row" role="group" aria-label="Date"><!-- champs MM / DD / YYYY -->
-            <button type="button" id="fMM" class="df" data-f="mm" data-ph="MM" aria-label="Month"><span class="df-val">MM</span></button><!-- mois -->
+          <h1 id="t3" class="date-title" tabindex="-1" data-focus data-t="titreDate">Quand est-ce que je te choisis ?</h1><!-- titre -->
+          <p class="date-sub" data-t="sousTitreDate">Chaque jour. À commencer par aujourd’hui.</p><!-- sous-titre -->
+          <div class="bubble"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#m-heart"/></svg><span data-t="bulleDate">psst… tape ta date d’anniversaire ♡</span></div><!-- bulle de dialogue avec cœur -->
+          <div class="date-row" role="group" aria-label="Date"><!-- champs JJ / MM / AAAA (format français) -->
+            <button type="button" id="fDD" class="df" data-f="dd" data-ph="JJ" aria-label="Jour"><span class="df-val">JJ</span></button><!-- jour -->
             <span class="date-sep" aria-hidden="true">/</span><!-- séparateur -->
-            <button type="button" id="fDD" class="df" data-f="dd" data-ph="DD" aria-label="Day"><span class="df-val">DD</span></button><!-- jour -->
+            <button type="button" id="fMM" class="df" data-f="mm" data-ph="MM" aria-label="Mois"><span class="df-val">MM</span></button><!-- mois -->
             <span class="date-sep" aria-hidden="true">/</span><!-- séparateur -->
-            <button type="button" id="fYYYY" class="df df-year" data-f="yyyy" data-ph="YYYY" aria-label="Year"><span class="df-val">YYYY</span></button><!-- année -->
+            <button type="button" id="fYYYY" class="df df-year" data-f="yyyy" data-ph="AAAA" aria-label="Année"><span class="df-val">AAAA</span></button><!-- année -->
           </div><!-- fin des champs -->
-          <div class="keypad" role="group" aria-label="Keypad"><!-- pavé numérique -->
+          <div class="keypad" role="group" aria-label="Pavé numérique"><!-- pavé numérique -->
             <button type="button" class="key" data-k="1">1</button><button type="button" class="key" data-k="2">2</button><button type="button" class="key" data-k="3">3</button><!-- 1 2 3 -->
             <button type="button" class="key" data-k="4">4</button><button type="button" class="key" data-k="5">5</button><button type="button" class="key" data-k="6">6</button><!-- 4 5 6 -->
             <button type="button" class="key" data-k="7">7</button><button type="button" class="key" data-k="8">8</button><button type="button" class="key" data-k="9">9</button><!-- 7 8 9 -->
-            <button type="button" class="key key-fn" data-k="C" aria-label="Clear">C</button><button type="button" class="key" data-k="0">0</button><button type="button" class="key key-fn" data-k="back" aria-label="Delete">⌫</button><!-- C 0 ⌫ -->
+            <button type="button" class="key key-fn" data-k="C" aria-label="Tout effacer">C</button><button type="button" class="key" data-k="0">0</button><button type="button" class="key key-fn" data-k="back" aria-label="Effacer">⌫</button><!-- C 0 ⌫ -->
           </div><!-- fin du pavé -->
           <p id="dateMsg" class="date-msg" aria-live="polite"></p><!-- message d'erreur / réussite -->
-          <button id="unlockBtn" class="btn btn-main" type="button" data-t="boutonDate">Unlock my surprise ♡</button><!-- bouton valider -->
+          <button id="unlockBtn" class="btn btn-main" type="button" data-t="boutonDate">Débloquer ma surprise ♡</button><!-- bouton valider -->
         </div><!-- fin contenu -->
       </div><!-- fin fenêtre -->
     </section><!-- fin étape 3 -->
@@ -340,44 +340,44 @@
       <div id="scrap" class="scrap"><!-- collage (proportions fixes) -->
         <div class="paper-shadow" aria-hidden="true"><div class="paper torn"></div></div><!-- papier crème déchiré -->
         <span class="bit torn b1" aria-hidden="true"></span><span class="bit torn b2" aria-hidden="true"></span><span class="bit torn b3" aria-hidden="true"></span><!-- morceaux de papier -->
-        <h1 id="t4" class="scrap-title" tabindex="-1" data-focus data-t="titreChansonPage">Song For You</h1><!-- titre script rouge -->
+        <h1 id="t4" class="scrap-title" tabindex="-1" data-focus data-t="titreChansonPage">Une chanson pour toi</h1><!-- titre script rouge -->
         <figure class="polaroid"><!-- polaroid incliné -->
           <span class="washi washi-pink pol-tape" aria-hidden="true"></span><!-- scotch du polaroid -->
-          <img data-photo="couple" alt="Us"><!-- photo du couple -->
-          <figcaption data-t="legendePolaroid">us ♡</figcaption><!-- légende -->
+          <img data-photo="couple" alt="Nous"><!-- photo du couple -->
+          <figcaption data-t="legendePolaroid">nous ♡</figcaption><!-- légende -->
         </figure><!-- fin polaroid -->
         <div class="cd" aria-hidden="true"><span class="cd-st st1">♡</span><span class="cd-st st2">✦</span><span class="cd-st st3">★</span></div><!-- CD holographique + autocollants -->
-        <p class="note n1"><span class="washi washi-sage note-tape" aria-hidden="true"></span><span data-t="notes.0">you make life softer</span></p><!-- note 1 -->
-        <div class="player" role="group" aria-label="Music player"><!-- lecteur rouge -->
+        <p class="note n1"><span class="washi washi-sage note-tape" aria-hidden="true"></span><span data-t="notes.0">tu rends la vie plus douce</span></p><!-- note 1 -->
+        <div class="player" role="group" aria-label="Lecteur de musique"><!-- lecteur rouge -->
           <img class="player-cover" data-photo="pochette" alt=""><!-- pochette -->
           <div class="player-info"><!-- infos -->
-            <p class="player-title" data-c="titreChanson">Our Song</p><!-- titre de la chanson -->
-            <p class="player-artist" data-c="artiste">You &amp; Me</p><!-- artiste -->
+            <p class="player-title" data-c="titreChanson">Notre chanson</p><!-- titre de la chanson -->
+            <p class="player-artist" data-c="artiste">Toi &amp; moi</p><!-- artiste -->
             <div class="player-bar"><span id="songBar"></span></div><!-- barre de progression -->
             <p class="player-time"><span id="songTime">0:00</span><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></p><!-- temps + égaliseur -->
           </div><!-- fin infos -->
-          <button id="playBtn" class="player-play" type="button" aria-pressed="false" aria-label="Play the song"><span class="ico" aria-hidden="true">▶</span></button><!-- bouton lecture -->
+          <button id="playBtn" class="player-play" type="button" aria-pressed="false" aria-label="Lancer la chanson"><span class="ico" aria-hidden="true">▶</span></button><!-- bouton lecture -->
         </div><!-- fin lecteur -->
-        <p class="note n2" data-t="notes.1">my favorite kind of love</p><!-- note 2 -->
+        <p class="note n2" data-t="notes.1">mon genre d’amour préféré</p><!-- note 2 -->
         <div class="vinyl" aria-hidden="true"></div><!-- vinyle noir qui dépasse -->
         <div class="cassette" aria-hidden="true"><!-- cassette rose -->
           <span class="washi washi-dots cas-tape"></span><!-- scotch -->
-          <div class="cas-label"><span data-t="cassette">you &amp; me</span></div><!-- étiquette -->
+          <div class="cas-label"><span data-t="cassette">toi &amp; moi</span></div><!-- étiquette -->
           <div class="cas-window"><span class="reel"></span><span class="reel"></span></div><!-- fenêtre + bobines -->
           <div class="cas-bottom"></div><!-- bas trapézoïdal -->
         </div><!-- fin cassette -->
-        <p class="note n3" data-t="notes.2">good music, brighter days</p><!-- note 3 -->
+        <p class="note n3" data-t="notes.2">bonne musique, jours plus doux</p><!-- note 3 -->
         <svg class="pix px1" viewBox="0 0 7 6" aria-hidden="true"><use href="#m-pixheart"/></svg><!-- cœur pixel 1 -->
         <svg class="pix px2" viewBox="0 0 7 6" aria-hidden="true"><use href="#m-pixheart"/></svg><!-- cœur pixel 2 -->
         <svg class="pix px3" viewBox="0 0 7 6" aria-hidden="true"><use href="#m-pixheart"/></svg><!-- cœur pixel 3 -->
       </div><!-- fin collage -->
       <p id="audioHint" class="audio-hint" hidden></p><!-- info si fichier audio absent -->
-      <button class="btn btn-main btn-next" type="button" data-next="5" data-t="continuer">Continue ♡</button><!-- continuer -->
+      <button class="btn btn-main btn-next" type="button" data-next="5" data-t="continuer">Continuer ♡</button><!-- continuer -->
     </section><!-- fin étape 4 -->
 
     <!-- ── ÉTAPE 5 : MATCHA CLUB (photobooth) ── -->
     <section class="step step-5" data-step="5" aria-labelledby="t5" hidden><!-- écran 5 -->
-      <h1 id="t5" class="sr-only" tabindex="-1" data-focus>Matcha Club photobooth</h1><!-- titre pour lecteurs d'écran -->
+      <h1 id="t5" class="sr-only" tabindex="-1" data-focus>Photomaton Matcha Club</h1><!-- titre pour lecteurs d'écran -->
       <div id="booth" class="booth"><!-- scène photobooth -->
         <svg class="sticker st-logo" viewBox="0 0 200 200" aria-hidden="true"><use href="#m-matcha"/></svg><!-- logo matcha CLUB -->
         <svg class="sticker st-tulip" viewBox="0 0 120 170" aria-hidden="true"><use href="#m-tulip"/></svg><!-- tulipe -->
@@ -385,28 +385,28 @@
         <svg class="sticker st-cat" viewBox="0 0 120 150" aria-hidden="true"><use href="#m-cat"/></svg><!-- chat noir -->
         <div class="strip" aria-hidden="true"><!-- bande photobooth marron -->
           <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div><!-- 4 emplacements -->
-          <p class="strip-label" data-t="legendeBooth">♡ you &amp; me ♡</p><!-- légende -->
+          <p class="strip-label" data-t="legendeBooth">♡ toi &amp; moi ♡</p><!-- légende -->
         </div><!-- fin bande -->
         <figure class="bphoto" style="--r:-9deg;left:3%;top:25%"><img data-photo="booth.0" alt="Photo 1"></figure><!-- photo 1 éparpillée -->
         <figure class="bphoto" style="--r:7deg;left:57%;top:29%"><img data-photo="booth.1" alt="Photo 2"></figure><!-- photo 2 éparpillée -->
         <figure class="bphoto" style="--r:5deg;left:7%;top:52%"><img data-photo="booth.2" alt="Photo 3"></figure><!-- photo 3 éparpillée -->
         <figure class="bphoto" style="--r:-6deg;left:53%;top:57%"><img data-photo="booth.3" alt="Photo 4"></figure><!-- photo 4 éparpillée -->
       </div><!-- fin scène -->
-      <button id="boothNext" class="btn btn-main btn-next" type="button" data-next="6" data-t="continuer" hidden>Continue ♡</button><!-- continuer (après rangement) -->
+      <button id="boothNext" class="btn btn-main btn-next" type="button" data-next="6" data-t="continuer" hidden>Continuer ♡</button><!-- continuer (après rangement) -->
     </section><!-- fin étape 5 -->
 
     <!-- ── ÉTAPE 6 : ONE LAST SECRET (carte à gratter) ── -->
     <section class="step step-6" data-step="6" aria-labelledby="t6" hidden><!-- écran 6 -->
-      <h1 id="t6" class="secret-title" tabindex="-1" data-focus data-t="secret1">I have one last secret for you…</h1><!-- titre -->
-      <p class="secret-sub" data-t="secret2">Scratch the heart to find out ♡</p><!-- consigne -->
+      <h1 id="t6" class="secret-title" tabindex="-1" data-focus data-t="secret1">J’ai un dernier secret pour toi…</h1><!-- titre -->
+      <p class="secret-sub" data-t="secret2">Gratte le cœur pour le découvrir ♡</p><!-- consigne -->
       <div id="scratchZone" class="scratch-zone"><!-- zone de grattage -->
-        <img id="scratchPhoto" class="scratch-photo" data-photo="gratter" alt="Secret photo"><!-- photo cachée dessous -->
-        <canvas id="scratchCanvas" class="scratch-canvas" aria-label="Scratch card heart"></canvas><!-- cœur à gratter -->
+        <img id="scratchPhoto" class="scratch-photo" data-photo="gratter" alt="Photo secrète"><!-- photo cachée dessous -->
+        <canvas id="scratchCanvas" class="scratch-canvas" aria-label="Cœur à gratter"></canvas><!-- cœur à gratter -->
         <svg class="mascot capy capy-l" viewBox="0 0 160 130" aria-hidden="true"><use href="#m-capy-flower"/></svg><!-- capybara à la fleur -->
         <svg class="mascot capy capy-r" viewBox="0 0 160 130" aria-hidden="true"><use href="#m-capy-letter"/></svg><!-- capybara à la lettre -->
       </div><!-- fin zone -->
-      <button id="revealBtn" class="link-btn" type="button">or tap here to reveal ♡</button><!-- alternative clavier / accessibilité -->
-      <button id="scratchNext" class="btn btn-main btn-next" type="button" data-next="7" data-t="continuer" hidden>Continue ♡</button><!-- continuer (après grattage) -->
+      <button id="revealBtn" class="link-btn" type="button">ou touche ici pour tout révéler ♡</button><!-- alternative clavier / accessibilité -->
+      <button id="scratchNext" class="btn btn-main btn-next" type="button" data-next="7" data-t="continuer" hidden>Continuer ♡</button><!-- continuer (après grattage) -->
     </section><!-- fin étape 6 -->
 
     <!-- ── ÉTAPE 7 : DEAR SUITOR, (lettre) ── -->
@@ -415,16 +415,16 @@
         <svg class="letter-bow" viewBox="0 0 120 100" aria-hidden="true"><use href="#m-bow"/></svg><!-- ruban vert noué -->
         <svg class="letter-heart lh1" viewBox="0 0 100 100" aria-hidden="true"><use href="#m-heart"/></svg><!-- petit cœur rose 1 -->
         <svg class="letter-heart lh2" viewBox="0 0 100 100" aria-hidden="true"><use href="#m-heart"/></svg><!-- petit cœur rose 2 -->
-        <h1 id="t7" class="sr-only" tabindex="-1" data-focus>A letter for you</h1><!-- titre pour lecteurs d'écran -->
+        <h1 id="t7" class="sr-only" tabindex="-1" data-focus>Une lettre pour toi</h1><!-- titre pour lecteurs d'écran -->
         <div id="letterText" class="letter-text" aria-hidden="true"></div><!-- texte tapé lettre par lettre -->
         <p id="letterSr" class="sr-only"></p><!-- texte complet pour lecteurs d'écran -->
       </article><!-- fin lettre -->
-      <button id="replayBtn" class="btn btn-main" type="button" data-t="rejouer" hidden>Replay ♡</button><!-- rejouer -->
+      <button id="replayBtn" class="btn btn-main" type="button" data-t="rejouer" hidden>Recommencer ♡</button><!-- rejouer -->
     </section><!-- fin étape 7 -->
 
   </main><!-- fin application -->
 
-  <noscript><p style="text-align:center;padding:20px">Please enable JavaScript to open your surprise ♡</p></noscript><!-- message si JavaScript coupé -->
+  <noscript><p style="text-align:center;padding:20px">Active JavaScript pour ouvrir ta surprise ♡</p></noscript><!-- message si JavaScript coupé -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script><!-- GSAP 3.12.5 (version fixe) ; le site marche aussi sans -->
   <script src="script.js"></script><!-- logique du site -->

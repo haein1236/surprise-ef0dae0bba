@@ -3,76 +3,81 @@
    ========================================================================== */
 
 const CONFIG = {                                           // objet global lu par index.html et script.js
-  destinataire: "Suitor",                                  // prénom / surnom de la personne qui reçoit → « Dear Suitor, »
-  expediteur: "Your Valentine",                            // ta signature en bas de la lettre (étape 7)
-  dateSecrete: "10-17",                                    // date à deviner : "MM-DD" (année libre) ou "MM-DD-YYYY" (année exigée)
-  titreChanson: "Our Song",                                // titre affiché sur le lecteur (étape 4)
-  artiste: "You & Me",                                     // artiste affiché sous le titre
+  destinataire: "mon cœur",                                // nom utilisé si la personne ne donne pas son prénom
+  expediteur: "Ton amoureux·se",                           // ta signature en bas de la lettre (étape 7)
+  toutesLesDates: true,                                    // true = N'IMPORTE QUELLE date valide (ex. sa date d'anniversaire) débloque la surprise
+  dateSecrete: "17-10",                                    // utilisée seulement si toutesLesDates = false : "JJ-MM" (année libre) ou "JJ-MM-AAAA"
+  titreChanson: "Notre chanson",                           // titre affiché sur le lecteur (étape 4)
+  artiste: "Toi & moi",                                    // artiste affiché sous le titre
   fichierAudio: "audio/chanson.mp3",                       // ta chanson (mp3, m4a ou mp4) ; vide = petite mélodie « boîte à musique » générée
 
   photos: {                                                // chemins des photos (noms simples, sans espaces ni emoji)
     couple: "img/couple.jpg",                              // photo du couple : polaroid (carrée de préférence)
     pochette: "img/pochette.jpg",                          // pochette du lecteur de musique (vide = même photo que couple)
-    booth: [                                               // 4 photos de la bande photobooth (format 4:3 paysage)
-      "img/booth-1.jpg",                                   // photo 1 du photobooth
-      "img/booth-2.jpg",                                   // photo 2 du photobooth
-      "img/booth-3.jpg",                                   // photo 3 du photobooth
-      "img/booth-4.jpg"                                    // photo 4 du photobooth
-    ],                                                     // fin de la liste photobooth
+    booth: [                                               // 4 photos de la bande photomaton (format 4:3 paysage)
+      "img/booth-1.jpg",                                   // photo 1 du photomaton
+      "img/booth-2.jpg",                                   // photo 2 du photomaton
+      "img/booth-3.jpg",                                   // photo 3 du photomaton
+      "img/booth-4.jpg"                                    // photo 4 du photomaton
+    ],                                                     // fin de la liste photomaton
     gratter: "img/secret.jpg"                              // photo révélée sous le cœur à gratter (carrée)
   },                                                       // fin des photos
 
-  demanderPrenom: true,                                    // true = au scan, un écran d'accueil demande le prénom (→ « Dear <prénom>, »)
+  demanderPrenom: true,                                    // true = au scan, un écran d'accueil demande le prénom (→ « <prénom>, mon cœur, »)
   proposerPerso: true,                                     // true = l'accueil propose de mettre SES propres photos et SA chanson
   //   Les fichiers choisis restent sur le téléphone de la personne (rien n'est envoyé sur Internet).
 
   lettre: [                                                // paragraphes de la lettre finale (autant que tu veux)
-    "If you're reading this, you've finally made it here… to the very last page of this little surprise I made just for you.", // paragraphe 1
-    "Every song, every photo and every tiny heart on this site is a piece of us. You make the ordinary days softer and the good days brighter.", // paragraphe 2
-    "So here is my last secret: I would choose you on every single date of the calendar. Today, tomorrow, and all the days after. ♡" // paragraphe 3
+    "Si tu lis ceci, c'est que tu es enfin arrivé·e jusqu'ici… à la toute dernière page de cette petite surprise que j'ai faite rien que pour toi.", // paragraphe 1
+    "Chaque chanson, chaque photo et chaque petit cœur de ce site est un morceau de nous. Tu rends les jours ordinaires plus doux et les beaux jours encore plus lumineux.", // paragraphe 2
+    "Alors voici mon dernier secret : je te choisirais à chaque date du calendrier. Aujourd'hui, demain, et tous les jours d'après. ♡" // paragraphe 3
   ],                                                       // fin de la lettre
 
   effetHtmlBrut: true,                                     // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
   dureeHtmlBrut: 1500,                                     // durée de l'effet HTML brut en millisecondes
 
   textes: {                                                // tous les petits textes du parcours (facultatif à modifier)
-    bienvenue: "Hi there ♡",                               // titre de l'écran d'accueil
-    questionNom: "What's your name?",                      // question du prénom
-    placeholderNom: "your name ♡",                         // texte gris dans le champ prénom
-    erreurNom: "Tell me your name first ♡",                // message si le prénom est vide
-    questionPerso: "Do you want to use your own photos & song?", // question de personnalisation
-    ouiPerso: "Yes, my own ♡",                             // bouton oui (personnaliser)
-    nonPerso: "No, surprise me",                           // bouton non (garder ceux du site)
-    notePerso: "Tap a picture to replace it. Your files stay on your phone, nothing is uploaded.", // explication
-    chansonPerso: "Your song",                             // libellé du choix de chanson
-    resetPerso: "Reset to the original ones",              // bouton pour revenir aux fichiers d'origine
-    boutonDecouvrir: "Discover my surprise ♡",             // bouton pour entrer dans le site
-    pourToi: "for {nom} ♡",                                // petite ligne sous « You've Got Mail » ({nom} = prénom saisi)
-    titreMail: "You've Got Mail",                          // titre de l'étape 1
-    indiceBoite: "tap the box ♡",                          // petite consigne sous la boîte
-    question: "Are you interested to know?",               // question de l'étape 2
-    oui: "Yes, plz!",                                      // bouton oui
-    non: "No, tnx!",                                       // bouton non (fuyard)
-    erreurSysteme: "Error: \"No\" is not a valid answer ♡", // texte des fenêtres d'erreur
-    titreDate: "When do I choose you?",                    // titre de l'étape 3
-    sousTitreDate: "Every day. Start with today.",         // sous-titre de l'étape 3
-    bulleDate: "psst… it's our special day ♡",             // bulle d'indice de l'étape 3
-    boutonDate: "Unlock my surprise ♡",                    // bouton de validation de la date
-    erreurDate: "Not quite… try again ♡",                  // message si la date est fausse
-    bonneDate: "Yes! That's the one ♡",                    // message si la date est bonne
-    titreChansonPage: "Song For You",                      // titre script de l'étape 4
+    bienvenue: "Coucou ♡",                                 // titre de l'écran d'accueil
+    questionNom: "Comment tu t'appelles ?",                // question du prénom
+    placeholderNom: "ton prénom ♡",                        // texte gris dans le champ prénom
+    erreurNom: "Dis-moi d'abord ton prénom ♡",             // message si le prénom est vide
+    questionPerso: "Tu veux mettre tes propres photos et ta chanson ?", // question de personnalisation
+    ouiPerso: "Oui, les miennes ♡",                        // bouton oui (personnaliser)
+    nonPerso: "Non, surprends-moi",                        // bouton non (garder ceux du site)
+    notePerso: "Touche une image pour la remplacer. Tes fichiers restent sur ton téléphone, rien n'est envoyé.", // explication
+    chansonPerso: "Ta chanson",                            // libellé du choix de chanson
+    resetPerso: "Revenir aux originaux",                   // bouton pour revenir aux fichiers d'origine
+    boutonDecouvrir: "Découvrir ma surprise ♡",            // bouton pour entrer dans le site
+    pourToi: "pour {nom} ♡",                               // petite ligne sous le titre de l'étape 1 ({nom} = prénom saisi)
+    debutLettre: "{nom}, mon cœur,",                       // première ligne de la lettre ({nom} = prénom saisi)
+    titreMail: "Tu as du courrier",                        // titre de l'étape 1
+    indiceBoite: "touche la boîte ♡",                      // petite consigne sous la boîte
+    question: "Tu veux savoir ce que c'est ?",             // question de l'étape 2
+    oui: "Oui, stp !",                                     // bouton oui
+    non: "Non merci !",                                    // bouton non (fuyard)
+    erreurSysteme: "Erreur : « Non » n'est pas une réponse valide ♡", // texte des fenêtres d'erreur
+    titreErreur: "Erreur système",                         // titre des fenêtres d'erreur
+    titreDate: "Quand est-ce que je te choisis ?",         // titre de l'étape 3
+    sousTitreDate: "Chaque jour. À commencer par aujourd'hui.", // sous-titre de l'étape 3
+    bulleDate: "psst… tape ta date d'anniversaire ♡",      // bulle d'indice de l'étape 3
+    boutonDate: "Débloquer ma surprise ♡",                 // bouton de validation de la date
+    erreurDate: "Presque… réessaie ♡",                     // message si la date est fausse
+    dateInvalide: "Cette date n'existe pas… réessaie ♡",   // message si la date est impossible (ex. 31/02)
+    bonneDate: "Oui ! C'est la bonne ♡",                   // message si la date est acceptée
+    titreChansonPage: "Une chanson pour toi",              // titre script de l'étape 4
     notes: [                                               // 3 notes manuscrites du scrapbook
-      "you make life softer",                              // note 1
-      "my favorite kind of love",                          // note 2
-      "good music, brighter days"                          // note 3
+      "tu rends la vie plus douce",                        // note 1
+      "mon genre d'amour préféré",                         // note 2
+      "bonne musique, jours plus doux"                     // note 3
     ],                                                     // fin des notes
-    cassette: "you & me",                                  // étiquette de la cassette
-    legendePolaroid: "us ♡",                               // légende écrite sous le polaroid
-    legendeBooth: "♡ you & me ♡",                          // texte en bas de la bande photobooth
-    secret1: "I have one last secret for you…",            // titre de l'étape 6
-    secret2: "Scratch the heart to find out ♡",            // consigne de l'étape 6
-    signature: "Forever yours,",                           // formule avant ta signature (étape 7)
-    continuer: "Continue ♡",                               // texte des boutons « continuer »
-    rejouer: "Replay ♡"                                    // texte du bouton final
+    cassette: "toi & moi",                                 // étiquette de la cassette
+    legendePolaroid: "nous ♡",                             // légende écrite sous le polaroid
+    legendeBooth: "♡ toi & moi ♡",                         // texte en bas de la bande photomaton
+    secret1: "J'ai un dernier secret pour toi…",           // titre de l'étape 6
+    secret2: "Gratte le cœur pour le découvrir ♡",         // consigne de l'étape 6
+    gratteMoi: "gratte-moi ♡",                             // texte écrit sur le cœur à gratter
+    signature: "Pour toujours à toi,",                     // formule avant ta signature (étape 7)
+    continuer: "Continuer ♡",                              // texte des boutons « continuer »
+    rejouer: "Recommencer ♡"                               // texte du bouton final
   }                                                        // fin des textes
 };                                                         // fin de CONFIG
