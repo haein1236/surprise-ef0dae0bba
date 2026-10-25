@@ -604,6 +604,10 @@ body[data-bg="sage"] .bg-sage { opacity: 1; }                  /* …ou sauge : 
 .sync-body { display: flex; flex-direction: column; gap: 10px; text-align: left; font: .95rem/1.4 var(--f-body); } /* contenu */
 .sync-body textarea { width: 100%; font: 16px/1.4 ui-monospace, monospace; border: 2px solid var(--brown); border-radius: 10px; padding: 8px; background: #fff; color: var(--brown); } /* zones de texte */
 
+.sync-tr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } /* ligne traduction automatique */
+.sync-tr select { min-height: 44px; font: 16px var(--f-body); border: 2px solid var(--brown); border-radius: 10px; background: #fff; color: var(--brown); padding: 0 8px; } /* choix de langue */
+.sync-help { font-size: .85rem; opacity: .75; }                /* avertissement */
+
 /* ───── 12 quater. ÉTAPE 9 : FIN ───── */
 .end-title { margin-bottom: 0; }                               /* titre */
 .end-sub { font: 1.15rem/1.3 var(--f-hand); text-align: center; max-width: 360px; } /* consigne */

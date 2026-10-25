@@ -254,6 +254,7 @@
             <button type="button" id="ownReset" class="link-btn" data-t="resetPerso">Revenir aux originaux</button><!-- revenir aux originaux -->
           </div><!-- fin sélection -->
           <p id="setupMsg" class="date-msg" aria-live="polite"></p><!-- message -->
+          <p id="notifNote" class="own-note" data-t="noteNotif" hidden>Petit secret : je reçois une notif quand tu ouvres ma surprise ♡</p><!-- transparence : la personne sait qu'une notif est envoyée -->
           <button type="submit" class="btn btn-main" data-t="boutonDecouvrir">Découvrir ma surprise ♡</button><!-- entrer dans le site -->
         </form><!-- fin formulaire -->
       </div><!-- fin fenêtre -->
@@ -474,6 +475,15 @@
         <div class="win-body sync-body"><!-- contenu -->
           <label for="syncInput">1. Colle les paroles, une ligne par ligne : <b>texte | traduction</b></label><!-- consigne 1 -->
           <textarea id="syncInput" rows="6" placeholder="ligne originale | traduction en français"></textarea><!-- paroles à caler -->
+          <div class="sync-tr"><!-- traduction automatique -->
+            <label for="syncLang">Langue de la chanson</label><!-- libellé -->
+            <select id="syncLang"><!-- langue d'origine -->
+              <option value="en">Anglais</option><option value="es">Espagnol</option><option value="ko">Coréen</option><option value="ja">Japonais</option><!-- langues 1 -->
+              <option value="pt">Portugais</option><option value="it">Italien</option><option value="de">Allemand</option><option value="ar">Arabe</option><option value="zh">Chinois</option><!-- langues 2 -->
+            </select><!-- fin langues -->
+            <button id="syncTranslate" class="btn btn-choice" type="button">🌍 Traduire automatiquement</button><!-- remplit les « | traduction » manquantes -->
+          </div><!-- fin traduction -->
+          <p class="sync-help">La traduction automatique est approximative : relis-la et corrige-la directement dans la case avant de caler les lignes.</p><!-- avertissement -->
           <p>2. Lance la musique ▶, puis touche le bouton au <b>début</b> de chaque ligne.</p><!-- consigne 2 -->
           <button id="syncNext" class="btn btn-main" type="button">Ligne suivante ♪</button><!-- enregistre le temps -->
           <p id="syncState" aria-live="polite"></p><!-- avancement -->

@@ -19,6 +19,29 @@
   const HEART_D = 'M50 88C20 68 4 50 4 31C4 17 15 7 28 7C38 7 46 13 50 22C54 13 62 7 72 7C85 7 96 17 96 31C96 50 80 68 50 88Z'; // tracé du cœur (repère 100×100)
   const vibrate = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) { /* vibration indisponible */ } }; // vibration sûre
 
+  /* ───── 0 bis. NOTIFICATIONS (appli gratuite ntfy : https://ntfy.sh) ───── */
+  const N = C.notifications || {};                                        // réglages de notification
+  const notifOn = N.actif !== false && !!N.sujet                          // activées et canal défini…
+    && /^https?:$/.test(location.protocol)                                // …seulement sur le site en ligne (pas en test local)
+    && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)              // …ni sur un serveur de test
+    && !/[?&]synchro=/.test(location.search);                             // …ni pendant que tu cales les paroles
+  const device = /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone' : /Android/.test(navigator.userAgent) ? 'Android' : 'ordinateur'; // type d'appareil (rien de plus précis)
+  function notify(title, message, tags = 'heart') {                       // envoie une notification à TON téléphone
+    if (!notifOn) return;                                                 // désactivées
+    try {                                                                 // ne doit jamais casser le site
+      fetch('https://ntfy.sh/', {                                         // service ntfy (gratuit, sans compte)
+        method: 'POST',                                                   // publication
+        body: JSON.stringify({ topic: N.sujet, title, message, tags: String(tags).split(',') }), // contenu (JSON = accents et emoji OK)
+        keepalive: true                                                   // part même si la page se ferme juste après
+      }).catch(() => {});                                                 // pas de réseau : tant pis, en silence
+    } catch (e) { /* fetch indisponible */ }                              // vieux navigateur
+  }                                                                       // fin notify
+  const who = () => visitorName || 'Quelqu’un';                           // prénom saisi (ou « Quelqu'un » avant l'accueil)
+  const once = (key, fn) => {                                             // une seule notif par visite pour un même événement
+    try { if (sessionStorage.getItem('n.' + key)) return; sessionStorage.setItem('n.' + key, '1'); } catch (e) { /* stockage indisponible */ } // déjà envoyée ?
+    fn();                                                                 // envoie
+  };                                                                      // fin once
+
   const EASES = {                                                         // courbes CSS équivalentes aux eases GSAP
     'power2.out': 'cubic-bezier(.22,.61,.36,1)',                          // décélération douce
     'power2.in': 'cubic-bezier(.55,0,1,.45)',                             // accélération
@@ -167,6 +190,7 @@
     html.classList.add('is-styled');                                      // phase stylée
     raw.hidden = true;                                                    // cache le bloc brut
     app.hidden = false;                                                   // affiche l'application
+    once('open', () => notify('📬 Ta surprise vient d’être ouverte', `Quelqu’un a scanné ton QR code (${device}).`, 'mailbox_with_mail')); // notif : ouverture
     await startJourney();                                                 // accueil (prénom / perso) ou directement l'étape 1
     fx(app, { opacity: 0, scale: .96, y: 12 }, { opacity: 1, scale: 1, y: 0 }, { duration: .8, ease: 'back.out(1.7)' }); // fondu + petit rebond
   }                                                                       // fin lightUp
@@ -317,6 +341,7 @@
       return;                                                             // on s'arrête là
     }                                                                     // fin mauvaise date
     unlocked = true;                                                      // réussite
+    once('date', () => notify(`🎂 ${who()} a tapé une date`, `${dateState.dd}/${dateState.mm}${dateState.yyyy ? '/' + dateState.yyyy : ''}`, 'birthday')); // notif : date tapée
     dateMsg.textContent = T.bonneDate || 'Oui ! ♡';                        // message
     dateMsg.classList.add('ok');                                          // style vert
     const r = dateWin.getBoundingClientRect();                            // position fenêtre
@@ -638,6 +663,7 @@
       if (!skipTyping) await wait(280);                                   // pause entre paragraphes
     }                                                                     // fin paragraphes
     caret.remove();                                                       // retire le curseur
+    once('letter', () => notify(`💌 ${who()} a lu ta lettre`, 'Jusqu’au bout ♡', 'envelope_with_arrow')); // notif : lettre
     typing = false;                                                       // fini
     rise(28);                                                             // cœurs qui montent
     const al = $('#afterLetter');                                         // question « Tu veux écouter notre chanson ? »
@@ -688,7 +714,7 @@
   };                                                                      // fin onTime
   $('#mTitle').textContent = C.titreChanson || 'Notre chanson';           // titre de la chanson
   $('#mArtist').textContent = C.artiste || '';                            // artiste
-  $('#musicYes').addEventListener('click', () => { togglePlay(true); goTo(8); }); // « Oui » → musique lancée TOUT DE SUITE (exigé par iPhone) + écran musique
+  $('#musicYes').addEventListener('click', () => { once('music', () => notify(`🎧 ${who()} écoute votre chanson`, 'Elle/il a dit oui ♡', 'headphones')); togglePlay(true); goTo(8); }); // « Oui » → musique lancée TOUT DE SUITE (exigé par iPhone) + écran musique
   $('#musicNo').addEventListener('click', () => {                         // « Pas maintenant »
     const m = $('#musicNoMsg');                                           // zone de message
     m.textContent = T.reponseNonMusique || 'D’accord… je la garde au chaud pour toi 🥺♡'; // réponse mignonne
@@ -740,6 +766,29 @@
   const syncRec = [];                                                     // lignes déjà calées
   if (isSync) {                                                           // seulement en mode synchro
     $('#syncPanel').hidden = false;                                       // affiche l'outil
+    $('#syncTranslate').addEventListener('click', async () => {           // « 🌍 Traduire automatiquement »
+      const box = $('#syncInput'), btn = $('#syncTranslate'), state = $('#syncState'); // éléments
+      const lang = $('#syncLang').value;                                  // langue d'origine
+      const lines = box.value.split('\n');                                // toutes les lignes
+      const todo = lines.filter(l => l.trim() && !l.includes('|')).length; // lignes sans traduction
+      if (!todo) { state.textContent = 'Rien à traduire : colle des lignes sans « | » ♡'; return; } // rien à faire
+      btn.disabled = true;                                                // évite le double clic
+      let done = 0;                                                       // compteur
+      for (let i = 0; i < lines.length; i++) {                            // ligne par ligne
+        const src = lines[i].trim();                                      // texte d'origine
+        if (!src || src.includes('|')) continue;                          // vide ou déjà traduite
+        state.textContent = `Traduction ${++done} / ${todo}…`;            // avancement
+        try {                                                             // service gratuit MyMemory
+          const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(src.slice(0, 450))}&langpair=${lang}|fr`); // demande
+          const j = await r.json();                                       // réponse
+          const tr = j && j.responseData && j.responseData.translatedText; // traduction
+          lines[i] = `${src} | ${tr && j.responseStatus === 200 ? tr : ''}`; // « original | traduction »
+        } catch (e) { lines[i] = `${src} | `; }                           // pas de réseau : à compléter à la main
+        box.value = lines.join('\n');                                     // met à jour la case au fur et à mesure
+      }                                                                   // fin boucle
+      btn.disabled = false;                                               // réactive
+      state.textContent = 'Traduit ! Relis et corrige si besoin, puis cale les lignes ♪'; // fini
+    });                                                                   // fin traduction automatique
     $('#syncNext').addEventListener('click', () => {                      // « Ligne suivante »
       const lines = $('#syncInput').value.split('\n').map(s => s.trim()).filter(Boolean); // lignes collées
       if (!lines.length) { $('#syncState').textContent = 'Colle d’abord les paroles ♡'; return; } // rien à caler
@@ -794,6 +843,7 @@
   const custom = {};                                                      // fichiers choisis : clé → { key, blob, name, url }
   let useOwn = false;                                                     // la personne a choisi « oui » ?
   nameInput.placeholder = T.placeholderNom || 'ton prénom ♡';              // texte gris du champ
+  $('#notifNote').hidden = !(N.actif !== false && N.sujet && N.prevenirLaPersonne !== false); // « je reçois une notif… » si activé
   $('#nameBlock').hidden = !askName;                                      // masque la question si désactivée
   $('#ownBlock').hidden = !askOwn;                                        // idem pour la personnalisation
 
@@ -856,6 +906,7 @@
     }                                                                     // fin vérification
     setupMsg.textContent = '';                                            // efface le message
     applyName(name);                                                      // utilise le prénom partout
+    once('name', () => notify(`💌 ${name || 'Quelqu’un'} commence ta surprise`, useOwn ? 'Avec ses propres photos 📷' : 'Avec tes photos ♡', 'love_letter')); // notif : prénom
     store.set('name', name);                                              // retient le prénom
     store.set('own', useOwn ? '1' : '0');                                 // retient le choix
     if (useOwn) await Promise.all(Object.values(custom).map(c => DB.put({ key: c.key, blob: c.blob, name: c.name }))); // garde les fichiers pour « Replay »
@@ -887,6 +938,7 @@
       if (b.classList.contains('is-used')) return;                        // une seule fois
       mark();                                                             // tampon
       usedCoupons.push(i); store.set('coupons', JSON.stringify(usedCoupons)); // retient
+      notify(`🎟️ ${who()} a utilisé un bon d’amour !`, String(txt), 'tickets'); // notif : coupon (à honorer 😉)
       const r = b.getBoundingClientRect();                                // position
       burst(r.right - 50, r.top + r.height / 2, 14, { spread: 150 });     // cœurs
       vibrate(25);                                                        // petite vibration
@@ -937,6 +989,7 @@
     promiseBtn.setAttribute('aria-pressed', 'true');                      // accessibilité
     $('#promiseLabel').textContent = T.promesseFaite || 'Promesse faite ! 🤙♡'; // message
     vibrate([40, 60, 40, 60, 120]);                                       // vibration de fête
+    once('promise', () => notify(`🤙 ${who()} a fait la promesse !`, 'Elle/il a vu tout le site jusqu’à la fin ♡', 'tada')); // notif : fin
     fireworks();                                                          // feu d'artifice
     say(T.promesseFaite || 'Promesse faite !');                           // annonce
     const end = $('#theEnd');                                             // générique
@@ -1001,6 +1054,7 @@
     msg.textContent = '…';                                                // patience
     try {                                                                 // protégé
       const blob = await makeSouvenir();                                  // fabrique l'image
+      once('souvenir', () => notify(`📸 ${who()} a gardé votre souvenir`, 'La carte-photo a été téléchargée ♡', 'camera')); // notif : souvenir
       const file = new File([blob], 'notre-souvenir.png', { type: 'image/png' }); // fichier
       if (navigator.canShare && navigator.canShare({ files: [file] })) {  // téléphone : menu « Partager / Enregistrer l'image »
         try { await navigator.share({ files: [file], title: T.titreSouvenir || 'Toi & moi ♡' }); msg.textContent = 'Souvenir gardé ♡'; } // partage

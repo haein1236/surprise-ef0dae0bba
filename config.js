@@ -55,7 +55,13 @@ const CONFIG = {                                           // objet global lu pa
     "Bon pour 100 bisous 💋"                               // coupon 3
   ],                                                       // fin des coupons
 
-  effetHtmlBrut: true,                                   // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
+  notifications: {                                         // te prévient sur ton téléphone quand quelqu'un ouvre la surprise (appli gratuite « ntfy »)
+    actif: true,                                           // false = aucune notification
+    sujet: "surprise-notif-0a6e720b60000ebf",              // ton canal secret : abonne-toi à CE nom dans l'appli ntfy (ne le partage pas)
+    prevenirLaPersonne: true                               // true = petite phrase sur l'accueil : « je reçois une notif quand tu ouvres ma surprise »
+  },                                                       // fin des notifications
+
+  effetHtmlBrut: true,                                  // true = la page s'affiche d'abord en HTML brut puis le CSS « s'allume »
   dureeHtmlBrut: 1500,                                     // durée de l'effet HTML brut en millisecondes
 
   textes: {                                                // tous les petits textes du parcours (facultatif à modifier)
@@ -72,6 +78,7 @@ const CONFIG = {                                           // objet global lu pa
     boutonDecouvrir: "Découvrir ma surprise ♡",            // bouton pour entrer dans le site
     pourToi: "pour {nom} ♡",                               // petite ligne sous le titre de l'étape 1 ({nom} = prénom saisi)
     debutLettre: "{nom}, mon cœur,",                       // première ligne de la lettre ({nom} = prénom saisi)
+    noteNotif: "Petit secret : je reçois une notif quand tu ouvres ma surprise ♡", // phrase de transparence sur l'accueil
     titreMail: "Tu as du courrier",                        // titre de l'étape 1
     indiceBoite: "touche la boîte ♡",                      // petite consigne sous la boîte
     question: "Tu veux savoir ce que c'est ?",             // question de l'étape 2
