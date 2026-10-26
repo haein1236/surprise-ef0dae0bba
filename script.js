@@ -681,9 +681,21 @@
   }));                                                                    // fin changer les photos
 
   /* ───── 11 bis. APRÈS LA LETTRE → ÉTAPE 8 : NOTRE CHANSON ───── */
-  const PAROLES = (Array.isArray(C.paroles) ? C.paroles : [])             // paroles synchronisées (config.js)
-    .filter(l => l && typeof l.t === 'number' && l.texte)                 // lignes valides seulement
-    .sort((a, b) => a.t - b.t);                                           // dans l'ordre du temps
+  const RAW = (Array.isArray(C.paroles) ? C.paroles : [])                 // paroles de config.js
+    .filter(l => l && l.texte && !/^[[^]]*]$/.test(String(l.texte).trim())); // sans les repères « [Intro] », « [Chorus] »…
+  const badTimes = RAW.some((l, i) => typeof l.t !== 'number' || (i > 0 && !(l.t > RAW[i - 1].t))); // temps absents ou identiques ?
+  let autoPending = C.calageAuto !== false && RAW.length > 1 && badTimes; // calage automatique à faire (quand la durée sera connue)
+  const PAROLES = autoPending ? RAW.map(l => ({ ...l, t: NaN }))          // temps calculés plus tard
+    : RAW.filter(l => typeof l.t === 'number').sort((a, b) => a.t - b.t); // temps fournis : on les garde
+  function autoTime(dur) {                                                // répartit les lignes sur la chanson (« calage improvisé »)
+    const start = Number(C.debutParoles) >= 0 ? Number(C.debutParoles) : 10; // début du chant (s)
+    const end = Math.max(start + 10, dur - (Number(C.finParolesAvant) >= 0 ? Number(C.finParolesAvant) : 8)); // fin du chant (s)
+    const w = PAROLES.map(l => 10 + String(l.texte).length);              // une ligne longue dure plus longtemps
+    const total = w.reduce((a, b) => a + b, 0);                           // poids total
+    let acc = 0;                                                          // cumul
+    PAROLES.forEach((l, i) => { l.t = Math.round((start + (end - start) * acc / total) * 10) / 10; acc += w[i]; }); // temps de chaque ligne
+    autoPending = false;                                                  // fait
+  }                                                                       // fin autoTime
   const MOTS = (Array.isArray(C.motsDoux) ? C.motsDoux : []).filter(Boolean); // mots doux de secours
   const lyPrev = $('.ly-prev'), lyNext = $('.ly-next'), lyNow = $('.ly-now'); // lignes affichées
   const lyText = $('.ly-text'), lyTrad = $('.ly-trad');                   // texte + traduction
@@ -705,6 +717,7 @@
     fx(lyNow, { opacity: 0, y: 12, scale: .96 }, { opacity: 1, y: 0, scale: 1 }, { duration: .45, ease: 'back.out(1.4)' }); // petite apparition
   }                                                                       // fin showLine
   onTime = secs => {                                                      // appelé à chaque image pendant la musique
+    if (autoPending) { const d = songPos().dur; if (d) autoTime(d); }     // calage automatique dès que la durée est connue
     if (current !== 8) return;                                            // seulement sur l’écran musique
     if (PAROLES.length) {                                                 // paroles synchronisées
       let i = -1;                                                         // aucune ligne avant la première
@@ -721,7 +734,7 @@
     const y = $('#musicYes');                                             // bouton oui
     y.classList.remove('wiggle'); void y.offsetWidth; y.classList.add('wiggle'); // il gigote pour donner envie
   });                                                                     // fin « non »
-  const lyToggle = $('#lyToggle'), trToggle = $('#trToggle');             // boutons d'option paroles / traduction
+  const lyToggle = $('#lyToggle');                                        // bouton d'option paroles (la traduction est toujours affichée)
   const prefGet = k => { try { return localStorage.getItem('surprise.' + k); } catch (e) { return null; } }; // lit une préférence
   const prefSet = (k, v) => { try { localStorage.setItem('surprise.' + k, v); } catch (e) { /* stockage indisponible */ } }; // écrit une préférence
   function setChip(btn, on, cls, key) {                                   // allume / éteint une option
@@ -731,12 +744,9 @@
   }                                                                       // fin setChip
   function updateChips() {                                                // adapte les boutons au contenu
     lyToggle.textContent = PAROLES.length ? '🎤 Paroles' : '💬 Mots doux'; // paroles ou mots doux
-    trToggle.hidden = !PAROLES.some(l => l.traduction);                   // pas de traduction → pas de bouton
   }                                                                       // fin updateChips
   setChip(lyToggle, prefGet('showLyrics') !== '0', 'no-lyrics', 'showLyrics'); // état mémorisé (affiché par défaut)
-  setChip(trToggle, prefGet('showTrad') !== '0', 'no-trad', 'showTrad');  // état mémorisé (affichée par défaut)
   lyToggle.addEventListener('click', () => setChip(lyToggle, lyToggle.getAttribute('aria-pressed') !== 'true', 'no-lyrics', 'showLyrics')); // toucher = basculer les paroles
-  trToggle.addEventListener('click', () => setChip(trToggle, trToggle.getAttribute('aria-pressed') !== 'true', 'no-trad', 'showTrad')); // toucher = basculer la traduction
   updateChips();                                                          // premier affichage
   onEnter[8] = () => {                                                    // en arrivant sur l'écran musique
     updateChips();                                                        // boutons adaptés
@@ -831,6 +841,7 @@
       $('#syncOut').value = syncRec.length ? 'paroles: [\n' + syncRec.map(l => '  ' + JSON.stringify(l).replace(/"(t|texte|traduction)":/g, '$1: ') + ',').join('\n') + '\n],' : ''; // bloc prêt à coller
       if (syncRec.length) {                                               // seulement quand on cale vraiment (ne touche pas aux paroles de config.js sinon)
         PAROLES.splice(0, PAROLES.length, ...syncRec);                    // aperçu en direct sur l'écran musique
+        autoPending = false;                                              // calage manuel : plus de calage automatique
         updateChips();                                                    // le bouton 🌍 Traduction apparaît
         lyIndex = -2; if (onTime) onTime(songPos().secs);                 // rafraîchit l'affichage des paroles
       }                                                                   // fin aperçu

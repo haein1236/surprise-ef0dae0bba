@@ -33,6 +33,9 @@ const CONFIG = {                                           // objet global lu pa
     "Alors voici mon dernier secret : je te choisirais à chaque date du calendrier. Aujourd'hui, demain, et tous les jours d'après. ♡" // paragraphe 3
   ],                                                       // fin de la lettre
 
+  calageAuto: true,                                        // true = si les temps « t » sont absents ou identiques, le site répartit les lignes tout seul sur la chanson
+  debutParoles: 10,                                        // calage auto : seconde où le chant commence
+  finParolesAvant: 8,                                      // calage auto : secondes de musique sans paroles à la fin
   boutonParoles: true,                                     // true = bouton « 🎤 Ajouter / caler les paroles » sur l'écran musique (false = caché)
 
   paroles: [                                               // paroles synchronisées de la chanson (écran musique après la lettre)
