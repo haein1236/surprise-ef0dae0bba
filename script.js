@@ -764,8 +764,20 @@
   /* ───── 11 ter. OUTIL DE SYNCHRO DES PAROLES (adresse + ?synchro=1) ───── */
   const isSync = /[?&]synchro=/.test(location.search);                    // mode synchro ?
   const syncRec = [];                                                     // lignes déjà calées
-  if (isSync) {                                                           // seulement en mode synchro
-    $('#syncPanel').hidden = false;                                       // affiche l'outil
+  {                                                                       // outil disponible via le bouton 🎤 (ou ?synchro=1)
+    const syncPanel = $('#syncPanel'), syncToggle = $('#syncToggle');     // panneau + bouton
+    function showSync(open) {                                             // ouvre / ferme l'outil
+      syncPanel.hidden = !open;                                           // affiche ou cache
+      syncToggle.setAttribute('aria-expanded', String(open));             // accessibilité
+      syncToggle.textContent = open ? '✕ Fermer l’outil des paroles' : '🎤 Ajouter / caler les paroles'; // libellé
+      if (open) {                                                         // à l'ouverture
+        fx(syncPanel, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: .4, ease: 'back.out(1.4)' }); // apparition
+        syncPanel.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }); // descend jusqu'à l'outil
+      }                                                                   // fin ouverture
+    }                                                                     // fin showSync
+    syncToggle.hidden = C.boutonParoles === false && !isSync;             // bouton masquable dans config.js
+    syncToggle.addEventListener('click', () => showSync(syncPanel.hidden)); // toucher = ouvrir / fermer
+    showSync(isSync);                                                     // ouvert d'office avec ?synchro=1
     $('#syncTranslate').addEventListener('click', async () => {           // « 🌍 Traduire automatiquement »
       const box = $('#syncInput'), btn = $('#syncTranslate'), state = $('#syncState'); // éléments
       const lang = $('#syncLang').value;                                  // langue d'origine

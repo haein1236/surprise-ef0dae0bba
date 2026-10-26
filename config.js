@@ -33,6 +33,8 @@ const CONFIG = {                                           // objet global lu pa
     "Alors voici mon dernier secret : je te choisirais à chaque date du calendrier. Aujourd'hui, demain, et tous les jours d'après. ♡" // paragraphe 3
   ],                                                       // fin de la lettre
 
+  boutonParoles: true,                                     // true = bouton « 🎤 Ajouter / caler les paroles » sur l'écran musique (false = caché)
+
   paroles: [                                               // paroles synchronisées de la chanson (écran musique après la lettre)
     // { t: 12.5, texte: "ligne originale de la chanson", traduction: "sa traduction en français" },
     // t = seconde où la ligne commence. Astuce : ouvre le site avec ?synchro=1 à la fin de l'adresse
