@@ -721,7 +721,25 @@
     const y = $('#musicYes');                                             // bouton oui
     y.classList.remove('wiggle'); void y.offsetWidth; y.classList.add('wiggle'); // il gigote pour donner envie
   });                                                                     // fin « non »
+  const lyToggle = $('#lyToggle'), trToggle = $('#trToggle');             // boutons d'option paroles / traduction
+  const prefGet = k => { try { return localStorage.getItem('surprise.' + k); } catch (e) { return null; } }; // lit une préférence
+  const prefSet = (k, v) => { try { localStorage.setItem('surprise.' + k, v); } catch (e) { /* stockage indisponible */ } }; // écrit une préférence
+  function setChip(btn, on, cls, key) {                                   // allume / éteint une option
+    btn.setAttribute('aria-pressed', String(on));                         // état du bouton
+    musicStage.classList.toggle(cls, !on);                                // masque ou affiche la partie
+    prefSet(key, on ? '1' : '0');                                         // retient le choix sur ce téléphone
+  }                                                                       // fin setChip
+  function updateChips() {                                                // adapte les boutons au contenu
+    lyToggle.textContent = PAROLES.length ? '🎤 Paroles' : '💬 Mots doux'; // paroles ou mots doux
+    trToggle.hidden = !PAROLES.some(l => l.traduction);                   // pas de traduction → pas de bouton
+  }                                                                       // fin updateChips
+  setChip(lyToggle, prefGet('showLyrics') !== '0', 'no-lyrics', 'showLyrics'); // état mémorisé (affiché par défaut)
+  setChip(trToggle, prefGet('showTrad') !== '0', 'no-trad', 'showTrad');  // état mémorisé (affichée par défaut)
+  lyToggle.addEventListener('click', () => setChip(lyToggle, lyToggle.getAttribute('aria-pressed') !== 'true', 'no-lyrics', 'showLyrics')); // toucher = basculer les paroles
+  trToggle.addEventListener('click', () => setChip(trToggle, trToggle.getAttribute('aria-pressed') !== 'true', 'no-trad', 'showTrad')); // toucher = basculer la traduction
+  updateChips();                                                          // premier affichage
   onEnter[8] = () => {                                                    // en arrivant sur l'écran musique
+    updateChips();                                                        // boutons adaptés
     $('#mTitle').textContent = $('.player-title').textContent;            // même titre que le lecteur (chanson perso comprise)
     lyIndex = -2; paint(); showLine(PAROLES.length ? -1 : 0);              // première ligne
   };                                                                      // fin onEnter 8
@@ -813,6 +831,7 @@
       $('#syncOut').value = syncRec.length ? 'paroles: [\n' + syncRec.map(l => '  ' + JSON.stringify(l).replace(/"(t|texte|traduction)":/g, '$1: ') + ',').join('\n') + '\n],' : ''; // bloc prêt à coller
       if (syncRec.length) {                                               // seulement quand on cale vraiment (ne touche pas aux paroles de config.js sinon)
         PAROLES.splice(0, PAROLES.length, ...syncRec);                    // aperçu en direct sur l'écran musique
+        updateChips();                                                    // le bouton 🌍 Traduction apparaît
         lyIndex = -2; if (onTime) onTime(songPos().secs);                 // rafraîchit l'affichage des paroles
       }                                                                   // fin aperçu
     }                                                                     // fin refreshSync
