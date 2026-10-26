@@ -486,7 +486,12 @@
           </div><!-- fin traduction -->
           <p class="sync-help">La traduction automatique est approximative : relis-la et corrige-la directement dans la case avant de caler les lignes.</p><!-- avertissement -->
           <p>2. Lance la musique ▶, puis touche le bouton au <b>début</b> de chaque ligne.</p><!-- consigne 2 -->
-          <button id="syncNext" class="btn btn-main" type="button">Ligne suivante ♪</button><!-- enregistre le temps -->
+          <p id="syncNextLine" class="sync-next" aria-live="polite"></p><!-- prochaine ligne à caler -->
+          <button id="syncNext" class="btn btn-main sync-big" type="button">Ligne suivante ♪</button><!-- enregistre le temps -->
+          <div class="btn-row"><!-- corrections -->
+            <button id="syncUndo" class="btn btn-choice" type="button">↩ Annuler la dernière</button><!-- retire la dernière ligne calée -->
+            <button id="syncReset" class="btn btn-choice" type="button">⟲ Tout recommencer</button><!-- repart de zéro -->
+          </div><!-- fin corrections -->
           <p id="syncState" aria-live="polite"></p><!-- avancement -->
           <label for="syncOut">3. Copie ce bloc dans config.js (à la place de <b>paroles: [ ... ],</b>)</label><!-- consigne 3 -->
           <textarea id="syncOut" rows="6" readonly></textarea><!-- résultat à copier -->

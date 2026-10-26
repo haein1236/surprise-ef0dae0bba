@@ -801,15 +801,47 @@
       btn.disabled = false;                                               // réactive
       state.textContent = 'Traduit ! Relis et corrige si besoin, puis cale les lignes ♪'; // fini
     });                                                                   // fin traduction automatique
+    const syncInput = $('#syncInput'), syncState = $('#syncState'), syncNextLine = $('#syncNextLine'); // éléments
+    try { const saved = localStorage.getItem('surprise.syncInput'); if (saved && !syncInput.value) syncInput.value = saved; } catch (e) { /* stockage indisponible */ } // reprend les paroles déjà collées
+    syncInput.addEventListener('input', () => { try { localStorage.setItem('surprise.syncInput', syncInput.value); } catch (e) { /* stockage indisponible */ } refreshSync(); }); // garde les paroles en mémoire
+    const syncLines = () => syncInput.value.split('\n').map(s => s.trim())   // lignes collées…
+      .filter(s => s && !/^\[[^\]]*\](\s*\|\s*\[?[^\]]*\]?)?$/.test(s));  // …sans les repères « [Chorus] », « [Intro] | [Intro] »…
+    function refreshSync() {                                              // met à jour l'aperçu + le bloc
+      const lines = syncLines();                                          // lignes à caler
+      const next = lines[syncRec.length];                                 // prochaine ligne
+      syncNextLine.textContent = next ? `Prochaine ligne : « ${next.split('|')[0].trim()} »` : (lines.length ? 'Toutes les lignes sont calées ♡' : ''); // prochaine ligne affichée
+      $('#syncOut').value = syncRec.length ? 'paroles: [\n' + syncRec.map(l => '  ' + JSON.stringify(l).replace(/"(t|texte|traduction)":/g, '$1: ') + ',').join('\n') + '\n],' : ''; // bloc prêt à coller
+      if (syncRec.length) {                                               // seulement quand on cale vraiment (ne touche pas aux paroles de config.js sinon)
+        PAROLES.splice(0, PAROLES.length, ...syncRec);                    // aperçu en direct sur l'écran musique
+        lyIndex = -2; if (onTime) onTime(songPos().secs);                 // rafraîchit l'affichage des paroles
+      }                                                                   // fin aperçu
+    }                                                                     // fin refreshSync
     $('#syncNext').addEventListener('click', () => {                      // « Ligne suivante »
-      const lines = $('#syncInput').value.split('\n').map(s => s.trim()).filter(Boolean); // lignes collées
-      if (!lines.length) { $('#syncState').textContent = 'Colle d’abord les paroles ♡'; return; } // rien à caler
-      if (syncRec.length >= lines.length) { $('#syncState').textContent = 'Terminé ! Copie le bloc ci-dessous ♡'; return; } // fini
+      const lines = syncLines();                                          // lignes à caler
+      if (!lines.length) { syncState.textContent = 'Colle d’abord les paroles ♡'; return; } // rien à caler
+      if (!playing) { syncState.textContent = '▶ Lance d’abord la musique, puis touche ce bouton au moment où la ligne commence ♪'; return; } // musique en pause : on refuse
+      if (syncRec.length >= lines.length) { syncState.textContent = 'Terminé ! Copie le bloc ci-dessous ♡'; return; } // fini
+      const t = Math.round(songPos().secs * 10) / 10;                     // temps actuel arrondi à 0,1 s
+      const last = syncRec[syncRec.length - 1];                           // ligne précédente
+      if (last && t <= last.t) { syncState.textContent = 'Trop rapide : attends que la ligne suivante commence ♪'; return; } // deux lignes au même moment : refusé
       const [texte, traduction = ''] = lines[syncRec.length].split('|').map(s => s.trim()); // texte | traduction
-      syncRec.push({ t: Math.round(songPos().secs * 10) / 10, texte, traduction }); // temps actuel arrondi à 0,1 s
-      $('#syncState').textContent = `Ligne ${syncRec.length} / ${lines.length} calée à ${fmt(songPos().secs)}`; // avancement
-      $('#syncOut').value = 'paroles: [\n' + syncRec.map(l => '  ' + JSON.stringify(l).replace(/"(t|texte|traduction)":/g, '$1: ') + ',').join('\n') + '\n],'; // bloc prêt à coller
+      syncRec.push({ t, texte, traduction });                             // enregistre
+      syncState.textContent = `Ligne ${syncRec.length} / ${lines.length} calée à ${fmt(t)}`; // avancement
+      refreshSync();                                                      // aperçu + bloc
     });                                                                   // fin bouton
+    $('#syncUndo').addEventListener('click', () => {                      // « Annuler la dernière »
+      if (!syncRec.length) return;                                        // rien à annuler
+      syncRec.pop();                                                      // retire la dernière ligne calée
+      syncState.textContent = `Dernière ligne annulée (${syncRec.length} calée·s)`; // message
+      refreshSync();                                                      // aperçu + bloc
+    });                                                                   // fin annuler
+    $('#syncReset').addEventListener('click', () => {                     // « Tout recommencer »
+      syncRec.length = 0;                                                 // vide
+      if (audio) audio.currentTime = 0;                                   // musique au début
+      syncState.textContent = 'On recommence depuis le début ♪';          // message
+      refreshSync();                                                      // aperçu + bloc
+    });                                                                   // fin recommencer
+    refreshSync();                                                        // premier affichage
   }                                                                       // fin mode synchro
 
   /* ───── 12. ÉTAPE 0 : ACCUEIL (prénom + photos / chanson perso) ───── */
